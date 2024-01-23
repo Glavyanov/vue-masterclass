@@ -1,5 +1,5 @@
 <template>
-    <div class="col-large push-top">
+  <div class="col-large push-top" v-if="thread">
     <h1>{{ thread.title }}</h1>
 
     <div class="post-list">
@@ -42,9 +42,9 @@ import sourceData from "@/data.json";
 export default {
   props: {
     id: {
-        required: true,
-        type: String
-    }
+      required: true,
+      type: String,
+    },
   },
   data() {
     return {
@@ -55,15 +55,17 @@ export default {
   },
   computed: {
     thread() {
-        return this.threads.find(t => t.id === this.id);
-    }
+      return this.threads.find((t) => t.id === this.id);
+    },
   },
   methods: {
     postById: (id) => sourceData.posts.find((p) => p.id === id),
     userById: (id) => sourceData.users.find((p) => p.id === id),
   },
+  mounted() {
+    this.thread || this.$router.push({ name: 'NotFound' });
+  }
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
