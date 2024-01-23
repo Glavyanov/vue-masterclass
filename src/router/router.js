@@ -1,29 +1,29 @@
-import PageHome from "@/components/PageHome";
-import PageThreadShow from "@/components/PageThreadShow";
-import NotFound from "@/components/PageNotFound";
-import {createRouter, createWebHistory} from "vue-router";
+import PageHome from "@/pages/PageHome";
+import PageThreadShow from "@/pages/PageThreadShow";
+import NotFound from "@/pages/PageNotFound";
+import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   {
     path: "/",
-    name: 'Home',
+    name: "Home",
     component: PageHome,
   },
   {
     path: "/thread/:id",
-    name: 'ThreadShow',
+    name: "ThreadShow",
     component: PageThreadShow,
-    props: true
+    props: true,
   },
   {
     path: "/:pathMatch(.*)*",
-    name: 'NotFound',
+    name: "NotFound",
     component: NotFound,
   },
 ];
 const router = createRouter({
-    history: createWebHistory(),
-    routes,
+  history: createWebHistory(),
+  routes,
 });
 
 export default router;
