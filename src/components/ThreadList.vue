@@ -10,7 +10,8 @@
           </p>
           <p class="text-faded text-xsmall">
             By <a href="#">{{ userById(thread.userId).name }}</a
-            >, {{ thread.publishedAt }}.
+            >, <app-date :timeStamp=" thread.publishedAt"/>.
+
           </p>
         </div>
 
@@ -27,7 +28,7 @@
             <p class="text-xsmall">
               <a href="#">{{ userById(thread.userId).name }}</a>
             </p>
-            <p class="text-xsmall text-faded">{{ thread.publishedAt }}</p>
+            <p class="text-xsmall text-faded"><app-date :timeStamp="thread.publishedAt"/></p>
           </div>
         </div>
       </div>
@@ -36,8 +37,6 @@
 </template>
 
 <script>
-import sourceData from "@/data.json";
-
 export default {
     props: {
         threads: {
@@ -46,8 +45,12 @@ export default {
         },
     },
     methods: {
-        postById: (id) => sourceData.posts.find((p) => p.id === id),
-        userById: (id) => sourceData.users.find((p) => p.id === id),
+        postById(id) {
+          return this.$store.state.posts.find((p) => p.id === id);
+        },
+        userById(id){
+          return this.$store.state.users.find((p) => p.id === id);
+        } 
     },
 };
 </script>
