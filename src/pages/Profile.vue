@@ -68,8 +68,6 @@ export default {
     ...mapGetters({ user: "authUser" }),
 
     userPosts() {
-        const posts = this.$store.state.posts;
-        debugger;
       return this.$store.state.posts.filter((p) => p.userId === this.user.id);
     },
 
