@@ -1,17 +1,19 @@
 <template>
   <div class="col-large push-top" v-if="thread">
     <h1>{{ thread.title }}</h1>
-    <post-list :posts="threadPosts"/>
+    <post-list :posts="threadPosts" />
+    <post-editor @save="addPost"/>
   </div>
 </template>
 
 <script>
-import sourceData from "@/data.json";
 import PostList from "@/components/PostList.vue";
+import PostEditor from "@/components/PostEditor.vue";
 
 export default {
   components: {
     PostList,
+    PostEditor,
   },
   props: {
     id: {
@@ -20,15 +22,28 @@ export default {
     },
   },
   computed: {
+    posts(){
+      return this.$store.state.posts;
+    },
     thread() {
-      return sourceData.threads.find((t) => t.id === this.id);
+      return this.$store.state.threads.find((t) => t.id === this.id);
     },
     threadPosts() {
-      return sourceData.posts.filter((p) => p.threadId === this.id);
+      return this.posts.filter((p) => p.threadId === this.id);
     },
   },
+  methods: {
+    addPost(event) {
+      this.$store.dispatch('createPost', {
+        ...event.post, 
+        threadId: this.id
+      });
+    }
+  },
   mounted() {
-    this.thread || this.$router.push({ name: 'NotFound' });
-  }
+    if (!this.thread) {
+      this.$router.push({ name: "NotFound" });
+    }
+  },
 };
 </script>
