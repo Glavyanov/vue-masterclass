@@ -1,5 +1,6 @@
 import Home from "@/pages/Home";
 import ThreadShow from "@/pages/ThreadShow";
+import ThreadCreate from "@/pages/ThreadCreate";
 import Forum from "@/pages/Forum";
 import Category from "@/pages/Category";
 import Profile from "@/pages/Profile";
@@ -40,6 +41,12 @@ const routes = [
     path: "/thread/:id",
     name: "ThreadShow",
     component: ThreadShow,
+    props: true,
+  },
+  {
+    path: "/forum/:forumId/thread/create",
+    name: "ThreadCreate",
+    component: ThreadCreate,
     props: true,
   },
   {
