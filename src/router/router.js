@@ -1,6 +1,7 @@
 import Home from "@/pages/Home";
 import ThreadShow from "@/pages/ThreadShow";
 import ThreadCreate from "@/pages/ThreadCreate";
+import ThreadEdit from "@/pages/ThreadEdit";
 import Forum from "@/pages/Forum";
 import Category from "@/pages/Category";
 import Profile from "@/pages/Profile";
@@ -17,7 +18,7 @@ const routes = [
     path: "/profile",
     name: "Profile",
     component: Profile,
-    meta: { toTop: true, smoothScroll: true }
+    meta: { toTop: true, smoothScroll: true },
   },
   {
     path: "/profile/edit",
@@ -50,6 +51,12 @@ const routes = [
     props: true,
   },
   {
+    path: "/thread/:id/edit",
+    name: "ThreadEdit",
+    component: ThreadEdit,
+    props: true,
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: NotFound,
@@ -59,16 +66,16 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to) {
-    const scroll = {}
+    const scroll = {};
 
-    if(to.meta.toTop){
+    if (to.meta.toTop) {
       scroll.top = 0;
     }
-    if(to.meta.smoothScroll){
-      scroll.behavior = 'smooth';
+    if (to.meta.smoothScroll) {
+      scroll.behavior = "smooth";
     }
     return scroll;
-  }
+  },
 });
 
 export default router;

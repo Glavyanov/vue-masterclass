@@ -45,7 +45,18 @@ export default createStore({
     updateUser({ commit }, user) {
       commit("setUser", { user, userId: user.id });
     },
-    createThread({ commit, state, dispatch }, { title, text, forumId }) {
+    async updateThread({ commit, state }, { title, text, id }) {
+      const thread = state.threads.find((t) => t.id === id);
+      const post = state.posts.find((p) => p.id === thread.posts[0]);
+      const newThread = { ...thread, title };
+      const newPost = { ...post, text };
+
+      commit("setThread", { thread: newThread });
+      commit("setPost", { post: newPost });
+
+      return thread;
+    },
+    async createThread({ commit, state, dispatch }, { title, text, forumId }) {
       const id = "foo" + Math.random();
       const userId = state.authId;
       const publishedAt = Math.floor(Date.now() / 1000);
@@ -57,20 +68,32 @@ export default createStore({
         userId,
       };
       commit("setThread", { thread });
-      commit("appendThreadToUser", { userId, threadId: id});
-      commit("appendThreadToForum", { forumId, threadId: id});
+      commit("appendThreadToUser", { userId, threadId: id });
+      commit("appendThreadToForum", { forumId, threadId: id });
       dispatch("createPost", { text, threadId: id });
+
+      return state.threads.find((t) => t.id === id);
     },
   },
   mutations: {
     setPost(state, { post }) {
-      state.posts.push(post);
+      const index = state.posts.findIndex((p) => p.id === post.id);
+      if (post.id && index !== -1) {
+        state.posts[index] = post;
+      } else {
+        state.posts.push(post);
+      }
     },
     setThread(state, { thread }) {
-      state.threads.push(thread);
+      const index = state.threads.findIndex((t) => t.id === thread.id);
+      if (thread.id && index !== -1) {
+        state.threads[index] = thread;
+      } else {
+        state.threads.push(thread);
+      }
     },
     appendPostToThread(state, { postId, threadId }) {
-      const thread = state.threads.find((t) => t.id === threadId)
+      const thread = state.threads.find((t) => t.id === threadId);
       thread.posts ||= [];
       thread.posts.push(postId);
     },
@@ -78,15 +101,15 @@ export default createStore({
       const userIndex = state.users.findIndex((u) => u.id === userId);
       state.users[userIndex] = user;
     },
-    appendThreadToForum(state, {forumId, threadId}){
-      const forum = state.forums.find((f) => f.id === forumId)
+    appendThreadToForum(state, { forumId, threadId }) {
+      const forum = state.forums.find((f) => f.id === forumId);
       forum.threads ||= [];
       forum.threads.push(threadId);
     },
-    appendThreadToUser(state, {userId, threadId}){
-      const user = state.users.find((u) => u.id === userId)
+    appendThreadToUser(state, { userId, threadId }) {
+      const user = state.users.find((u) => u.id === userId);
       user.threads ||= [];
       user.threads.push(threadId);
-    }
+    },
   },
 });
