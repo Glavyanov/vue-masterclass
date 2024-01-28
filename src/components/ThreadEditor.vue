@@ -31,7 +31,7 @@
       >
         Cancel
       </button>
-      <button class="btn btn-blue" type="submit" name="Publish">Publish</button>
+      <button class="btn btn-blue" type="submit">{{ existing ? 'Update': 'Publish' }}</button>
     </div>
   </form>
 </template>
@@ -53,6 +53,11 @@ export default {
       activeTitle: this.title,
       activeText: this.text,
     };
+  },
+  computed: {
+    existing(){
+      return !!this.title;
+    }
   },
   methods: {
     save() {

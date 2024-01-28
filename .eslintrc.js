@@ -13,6 +13,7 @@ module.exports = {
     "rules": {
       "no-unused-vars": process.env.NODE_ENV === "production" ? "error" : "warn",
       "no-debugger" : process.env.NODE_ENV === "production" ? "error" : "warn",
-      "vue/multi-word-component-names": "off"
+      "vue/multi-word-component-names": "off",
+      "vue/no-deprecated-router-link-tag-prop": "off"
     }
 }

@@ -1,8 +1,16 @@
 <template>
   <div class="col-large push-top" v-if="thread">
-    <h1>{{ thread.title }}</h1>
+    <h1>{{ thread.title }}
+      <router-link
+      :to="{ name: 'ThreadEdit', params: { id: thread.id } }"
+      class="btn-green btn-small"
+      tag="button"
+    >
+      Edit Thread
+    </router-link>
+    </h1>
     <post-list :posts="threadPosts" />
-    <post-editor @save="addPost"/>
+    <post-editor @save="addPost" />
   </div>
 </template>
 
@@ -22,7 +30,7 @@ export default {
     },
   },
   computed: {
-    posts(){
+    posts() {
       return this.$store.state.posts;
     },
     thread() {
@@ -34,11 +42,11 @@ export default {
   },
   methods: {
     addPost(event) {
-      this.$store.dispatch('createPost', {
-        ...event.post, 
-        threadId: this.id
+      this.$store.dispatch("createPost", {
+        ...event.post,
+        threadId: this.id,
       });
-    }
+    },
   },
   mounted() {
     if (!this.thread) {
