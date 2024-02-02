@@ -1,14 +1,26 @@
 <template>
   <div class="col-large push-top" v-if="thread">
-    <h1>{{ thread.title }}
+    <h1>
+      {{ thread.title }}
       <router-link
-      :to="{ name: 'ThreadEdit', params: { id: thread.id } }"
-      class="btn-green btn-small"
-      tag="button"
-    >
-      Edit Thread
-    </router-link>
+        :to="{ name: 'ThreadEdit', params: { id: thread.id } }"
+        class="btn-green btn-small"
+        tag="button"
+      >
+        Edit Thread
+      </router-link>
     </h1>
+
+    <p>
+      By <a href="#" class="link-unstyled">{{ thread.author.name }}</a>, <AppDate :timeStamp="thread.publishedAt"/>
+      <span
+        class="hide-mobile text-faded text-small"
+        style="float: right; margin-top: 2px"
+      >
+        {{ thread.repliesCount }} replies by {{ thread.contributorsCount }} contributors</span
+      >
+    </p>
+
     <post-list :posts="threadPosts" />
     <post-editor @save="addPost" />
   </div>
@@ -34,7 +46,7 @@ export default {
       return this.$store.state.posts;
     },
     thread() {
-      return this.$store.state.threads.find((t) => t.id === this.id);
+      return this.$store.getters.thread(this.id);
     },
     threadPosts() {
       return this.posts.filter((p) => p.threadId === this.id);

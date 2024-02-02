@@ -2,43 +2,57 @@ import { createStore } from "vuex";
 import sourceData from "@/data.json";
 import { findById, upsert } from "@/helpers";
 
-const makeAppendChildToParentMutation = ({child, parent}) => {
-  return (state, { childId, parentId }) => {
-    const resource = findById(state[parent], parentId);
-    resource[child] ||= [];
-    resource[child].push(childId);
-  };
-}
-
 export default createStore({
   state: {
     ...sourceData,
     authId: "VXjpr2WHa8Ux4Bnggym8QFLdv5C3",
   },
   getters: {
-    authUser: (state) => {
-      const user = findById(state.users, state.authId);
-      if (!user) {
-        return null;
-      }
-      return {
-        ...user,
+    authUser: (state, getters) => {
+      return getters.user(state.authId);
+    },
+    user: (state) => {
+      return (id) => {
+        const user = findById(state.users, id);
+        if (!user) {
+          return null;
+        }
+        return {
+          ...user,
 
-        get posts() {
-          return state.posts.filter((p) => p.userId === user.id);
-        },
+          get posts() {
+            return state.posts.filter((p) => p.userId === user.id);
+          },
 
-        get postsCount() {
-          return this.posts.length;
-        },
+          get postsCount() {
+            return this.posts.length;
+          },
 
-        get threads() {
-          return state.threads.filter((t) => t.userId === user.id);
-        },
+          get threads() {
+            return state.threads.filter((t) => t.userId === user.id);
+          },
 
-        get threadsCount() {
-          return this.threads.length;
-        },
+          get threadsCount() {
+            return this.threads.length;
+          },
+        };
+      };
+    },
+    thread: (state) => {
+      return (id) => {
+        const thread = findById(state.threads, id);
+        return {
+          ...thread,
+          get author() {
+            return findById(state.users, thread.userId);
+          },
+          get repliesCount() {
+            return thread.posts.length - 1;
+          },
+          get contributorsCount() {
+            return thread.contributors.length;
+          },
+        };
       };
     },
   },
@@ -49,7 +63,14 @@ export default createStore({
       post.userId = state.authId;
       post.publishedAt = Math.floor(Date.now() / 1000);
       commit("setPost", { post });
-      commit("appendPostToThread", { childId: postId, parentId: post.threadId });
+      commit("appendPostToThread", {
+        parentId: post.threadId,
+        childId: postId,
+      });
+      commit("appendContributorToThread", {
+        parentId: post.threadId,
+        childId: post.userId,
+      });
     },
     updateUser({ commit }, user) {
       commit("setUser", { user, userId: user.id });
@@ -77,8 +98,8 @@ export default createStore({
         userId,
       };
       commit("setThread", { thread });
-      commit("appendThreadToUser", { userId, threadId: id });
-      commit("appendThreadToForum", { forumId, threadId: id });
+      commit("appendThreadToUser", { parentId: userId, childId: id });
+      commit("appendThreadToForum", { parentId: forumId, childId: id });
       dispatch("createPost", { text, threadId: id });
 
       return findById(state.threads, id);
@@ -95,16 +116,31 @@ export default createStore({
       const userIndex = state.users.findIndex((u) => u.id === userId);
       state.users[userIndex] = user;
     },
-    appendPostToThread: makeAppendChildToParentMutation({child: 'posts', parent: 'threads'}),
-    appendThreadToForum(state, { forumId, threadId }) {
-      const forum = findById(state.forums, forumId);
-      forum.threads ||= [];
-      forum.threads.push(threadId);
-    },
-    appendThreadToUser(state, { userId, threadId }) {
-      const user = findById(state.users, userId);
-      user.threads ||= [];
-      user.threads.push(threadId);
-    },
+    appendPostToThread: makeAppendChildToParentMutation({
+      parent: "threads",
+      child: "posts",
+    }),
+    appendThreadToForum: makeAppendChildToParentMutation({
+      parent: "forums",
+      child: "threads",
+    }),
+    appendThreadToUser: makeAppendChildToParentMutation({
+      parent: "users",
+      child: "threads",
+    }),
+    appendContributorToThread: makeAppendChildToParentMutation({
+      parent: "threads",
+      child: "contributors",
+    }),
   },
 });
+
+function makeAppendChildToParentMutation({ parent, child }) {
+  return (state, { parentId, childId }) => {
+    const resource = findById(state[parent], parentId);
+    resource[child] ||= [];
+    if (!resource[child].includes(childId)) {
+      resource[child].push(childId);
+    }
+  };
+}
