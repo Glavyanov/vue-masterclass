@@ -16,7 +16,7 @@
       </div>
     </form>
     <component
-      src="https://www.google.com/recaptcha/api.js?render=SITEKEY"
+      :src="`https://www.google.com/recaptcha/api.js?render=${sitekey}`"
       :is="'script'"
     ></component>
     <div class="form-group">
@@ -27,12 +27,14 @@
 
 <script>
 import axios from "axios";
+import { sitekey, secretkey } from "@/config/recaptcha"
 
 export default {
   data() {
     return {
       text: "",
-      recaptchaToken: ""
+      recaptchaToken: "",
+      sitekey,
     };
   },
   methods: {
@@ -45,19 +47,20 @@ export default {
         /* eslint-disable */
         grecaptcha.ready(function () {
           grecaptcha
-            .execute("SITEKEY", {
+            .execute(sitekey, {
               action: "feedback",
             })
             .then(function (token) {
               if (token) {
                 axios
                   .post(
-                    `https://www.google.com/recaptcha/api/siteverify?secret=SECRETKEY&response=${token}`
+                    `https://www.google.com/recaptcha/api/siteverify?secret=${secretkey}&response=${token}`
                   )
                   .then((response) => {
                     const result = response.data;
                     if (result?.success && result?.score >= 0.9) {
                       console.log(result?.success, result?.score)
+                      debugger;
                       resolve(token);
                     } else {
                       reject(alert("ERROR in Post data!!!"));
