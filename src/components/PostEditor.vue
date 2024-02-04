@@ -20,14 +20,21 @@
       :is="'script'"
     ></component>
     <div class="form-group">
-      <textarea name="" id="recaptcha" cols="30" rows="10" class="form-input" v-model="recaptchaToken" />
+      <textarea
+        name=""
+        id="recaptcha"
+        cols="30"
+        rows="10"
+        class="form-input"
+        v-model="recaptchaToken"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import { sitekey, secretkey } from "@/config/recaptcha"
+import { sitekey, secretkey } from "@/config/recaptcha";
 
 export default {
   data() {
@@ -59,8 +66,6 @@ export default {
                   .then((response) => {
                     const result = response.data;
                     if (result?.success && result?.score >= 0.9) {
-                      console.log(result?.success, result?.score)
-                      debugger;
                       resolve(token);
                     } else {
                       reject(alert("ERROR in Post data!!!"));
@@ -83,9 +88,9 @@ export default {
         });
       })
         .then((result) => {
-            this.$emit("save", { post });
-            this.text = "";
-            this.recaptchaToken = result;
+          this.$emit("save", { post });
+          this.text = "";
+          this.recaptchaToken = result;
         })
         .catch((err) => {
           console.log(err);

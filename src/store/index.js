@@ -1,10 +1,25 @@
 import { createStore } from "vuex";
-import sourceData from "@/data.json";
 import { findById, upsert } from "@/helpers";
+import firebaseConfig from "@/config/firebase";
+import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  setDoc,
+  doc,
+} from "firebase/firestore";
+
+const firebase = initializeApp(firebaseConfig);
+const db = getFirestore(firebase);
 
 export default createStore({
   state: {
-    ...sourceData,
+    categories: [...(await getFirebaseResource("categories"))],
+    forums: [...(await getFirebaseResource("forums"))],
+    threads: [...(await getFirebaseResource("threads"))],
+    posts: [...(await getFirebaseResource("posts"))],
+    users: [...(await getFirebaseResource("users"))],
     authId: "VXjpr2WHa8Ux4Bnggym8QFLdv5C3",
   },
   getters: {
@@ -106,15 +121,17 @@ export default createStore({
     },
   },
   mutations: {
-    setPost(state, { post }) {
+    async setPost(state, { post }) {
       upsert(state.posts, post);
+      await setFirebaseResource("posts", post)
     },
     setThread(state, { thread }) {
       upsert(state.threads, thread);
     },
-    setUser(state, { user, userId }) {
-      const userIndex = state.users.findIndex((u) => u.id === userId);
-      state.users[userIndex] = user;
+    setUser(state, { user /* userId */ }) {
+      upsert(state.users, user);
+      // const userIndex = state.users.findIndex((u) => u.id === userId);
+      // state.users[userIndex] = user;
     },
     appendPostToThread: makeAppendChildToParentMutation({
       parent: "threads",
@@ -143,4 +160,22 @@ function makeAppendChildToParentMutation({ parent, child }) {
       resource[child].push(childId);
     }
   };
+}
+
+async function getFirebaseResource(resource) {
+  const arr = [];
+  const q = collection(db, resource);
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    arr.push({ ...doc.data(), id: doc.id });
+  });
+  return arr;
+}
+
+// Add a new document in collection "cities"
+async function setFirebaseResource(resources, resource) {
+  await setDoc(doc(db, resources, resource.id), {
+    ...resource,
+  });
 }

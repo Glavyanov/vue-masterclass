@@ -12,14 +12,19 @@
     </h1>
 
     <p>
-      By <a href="#" class="link-unstyled">{{ thread.author.name }}</a>, <AppDate :timeStamp="thread.publishedAt"/>
+      By <a href="#" class="link-unstyled">{{ thread.author?.name }}</a
+      >, 
+      <AppDate :timeStamp="thread?.publishedAt" />
       <span
         class="hide-mobile text-faded text-small"
         style="float: right; margin-top: 2px"
       >
-        {{ thread.repliesCount }} replies by {{ thread.contributorsCount }} contributors</span
+        {{ thread.repliesCount }} 
+          replies by
+        {{ thread.contributorsCount }} 
+        contributors</span
       >
-    </p>
+    </p> 
 
     <post-list :posts="threadPosts" />
     <post-editor @save="addPost" />
@@ -65,5 +70,13 @@ export default {
       this.$router.push({ name: "NotFound" });
     }
   },
-};
+  async created() {
+    // fetch the thread
+    // debugger;
+    // const id = this.id;
+    // const tA = this.$store.getters.thread(this.id);
+    // debugger;
+    //   const test = this.$store.state.threads;
+  }
+}
 </script>
