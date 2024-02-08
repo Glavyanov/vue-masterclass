@@ -78,7 +78,7 @@ export default createStore({
       post.id = postId;
       post.userId = state.authId;
       post.publishedAt = Math.floor(Date.now() / 1000);
-      commit("setPost", { post });
+      commit("setItem", { resource: "posts", item: post });
       commit("appendPostToThread", {
         parentId: post.threadId,
         childId: postId,
@@ -89,7 +89,7 @@ export default createStore({
       });
     },
     updateUser({ commit }, user) {
-      commit("setUser", { user, userId: user.id });
+      commit("setItem", { resource: "users", item: user });
     },
     async updateThread({ commit, state }, { title, text, id }) {
       const thread = findById(state.threads, id);
@@ -97,8 +97,8 @@ export default createStore({
       const newThread = { ...thread, title };
       const newPost = { ...post, text };
 
-      commit("setThread", { thread: newThread });
-      commit("setPost", { post: newPost });
+      commit("setItem", { resource: "threads", item: newThread });
+      commit("setItem", { resource: "posts", item: newPost });
 
       return thread;
     },
@@ -113,65 +113,38 @@ export default createStore({
         publishedAt,
         userId,
       };
-      commit("setThread", { thread });
+      commit("setItem", { resource: "threads", item: thread });
       commit("appendThreadToUser", { parentId: userId, childId: id });
       commit("appendThreadToForum", { parentId: forumId, childId: id });
       dispatch("createPost", { text, threadId: id });
 
       return findById(state.threads, id);
     },
-    fetchThread({state, commit}, { id }){
-      return new Promise((resolve) => {
-        // fetch tread
-        const docThread = doc(db, "threads", id);
-        getDoc(docThread).then((res) => {
-          if (res.exists()) {
-            const thread = { ...res.data(), id: res.id };
-            commit("setThread", { thread });
-            resolve(thread);
-          }
-        });
-      });
+    fetchThread({dispatch}, { id }){
+      return dispatch("fetchItem", { id, resource: "threads"});
     },
-    fetchUser({state, commit}, { id }){
-      return new Promise((resolve) => {
-        // fetch tread
-        const docUser = doc(db, "users", id);
-        getDoc(docUser).then((res) => {
-          if (res.exists()) {
-            const user = { ...res.data(), id: res.id };
-            commit("setUser", { user });
-            resolve(user);
-          }
-        });
-      });
+    fetchUser({dispatch}, { id }){
+      return dispatch("fetchItem", { id, resource: "users"});
     },
-    fetchPost({state, commit}, { id }){
+    fetchPost({dispatch}, { id }){
+      return dispatch("fetchItem", { id, resource: "posts"});
+    },
+    fetchItem({commit}, { id, resource }){
       return new Promise((resolve) => {
-        // fetch tread
-        const docPost = doc(db, "posts", id);
+        const docPost = doc(db, resource, id);
         getDoc(docPost).then((res) => {
           if (res.exists()) {
-            const post = { ...res.data(), id: res.id };
-            commit("setPost", { post });
-            resolve(post);
+            const item = { ...res.data(), id: res.id };
+            commit("setItem", { resource, item });
+            resolve(item);
           }
         });
       });
     },
   },
   mutations: {
-    /* async  */setPost(state, { post }) {
-      upsert(state.posts, post);
-      //await setFirebaseResource("posts", post)
-    },
-    setThread(state, { thread }) {
-      upsert(state.threads, thread);
-    },
-    setUser(state, { user /* userId */ }) {
-      upsert(state.users, user);
-      // const userIndex = state.users.findIndex((u) => u.id === userId);
-      // state.users[userIndex] = user;
+    setItem(state, { resource, item }){
+      upsert(state[resource], item);
     },
     appendPostToThread: makeAppendChildToParentMutation({
       parent: "threads",
