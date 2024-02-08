@@ -7,6 +7,7 @@ import {
   collection,
   getDocs,
   setDoc,
+  getDoc,
   doc,
 } from "firebase/firestore";
 
@@ -15,17 +16,17 @@ const db = getFirestore(firebase);
 
 export default createStore({
   state: {
-    categories: [...(await getFirebaseResource("categories"))],
-    forums: [...(await getFirebaseResource("forums"))],
-    threads: [...(await getFirebaseResource("threads"))],
-    posts: [...(await getFirebaseResource("posts"))],
-    users: [...(await getFirebaseResource("users"))],
+    categories: [],
+    forums: [],
+    threads: [],
+    posts: [],
+    users: [],
     authId: "VXjpr2WHa8Ux4Bnggym8QFLdv5C3",
   },
   getters: {
-    authUser: (state, getters) => {
+    /* authUser: (state, getters) => {
       return getters.user(state.authId);
-    },
+    }, */
     user: (state) => {
       return (id) => {
         const user = findById(state.users, id);
@@ -34,7 +35,7 @@ export default createStore({
         }
         return {
           ...user,
-
+/* 
           get posts() {
             return state.posts.filter((p) => p.userId === user.id);
           },
@@ -49,7 +50,7 @@ export default createStore({
 
           get threadsCount() {
             return this.threads.length;
-          },
+          }, */
         };
       };
     },
@@ -58,7 +59,7 @@ export default createStore({
         const thread = findById(state.threads, id);
         return {
           ...thread,
-          get author() {
+          /* get author() {
             return findById(state.users, thread.userId);
           },
           get repliesCount() {
@@ -66,7 +67,7 @@ export default createStore({
           },
           get contributorsCount() {
             return thread.contributors.length;
-          },
+          }, */
         };
       };
     },
@@ -119,11 +120,50 @@ export default createStore({
 
       return findById(state.threads, id);
     },
+    fetchThread({state, commit}, { id }){
+      return new Promise((resolve) => {
+        // fetch tread
+        const docThread = doc(db, "threads", id);
+        getDoc(docThread).then((res) => {
+          if (res.exists()) {
+            const thread = { ...res.data(), id: res.id };
+            commit("setThread", { thread });
+            resolve(thread);
+          }
+        });
+      });
+    },
+    fetchUser({state, commit}, { id }){
+      return new Promise((resolve) => {
+        // fetch tread
+        const docUser = doc(db, "users", id);
+        getDoc(docUser).then((res) => {
+          if (res.exists()) {
+            const user = { ...res.data(), id: res.id };
+            commit("setUser", { user });
+            resolve(user);
+          }
+        });
+      });
+    },
+    fetchPost({state, commit}, { id }){
+      return new Promise((resolve) => {
+        // fetch tread
+        const docPost = doc(db, "posts", id);
+        getDoc(docPost).then((res) => {
+          if (res.exists()) {
+            const post = { ...res.data(), id: res.id };
+            commit("setPost", { post });
+            resolve(post);
+          }
+        });
+      });
+    },
   },
   mutations: {
-    async setPost(state, { post }) {
+    /* async  */setPost(state, { post }) {
       upsert(state.posts, post);
-      await setFirebaseResource("posts", post)
+      //await setFirebaseResource("posts", post)
     },
     setThread(state, { thread }) {
       upsert(state.threads, thread);
@@ -173,7 +213,6 @@ async function getFirebaseResource(resource) {
   return arr;
 }
 
-// Add a new document in collection "cities"
 async function setFirebaseResource(resources, resource) {
   await setDoc(doc(db, resources, resource.id), {
     ...resource,

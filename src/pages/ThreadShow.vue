@@ -13,18 +13,18 @@
 
     <p>
       By <a href="#" class="link-unstyled">{{ thread.author?.name }}</a
-      >, 
+      >,
       <AppDate :timeStamp="thread?.publishedAt" />
       <span
         class="hide-mobile text-faded text-small"
         style="float: right; margin-top: 2px"
       >
-        {{ thread.repliesCount }} 
-          replies by
-        {{ thread.contributorsCount }} 
+        <!-- {{ thread.repliesCount }} -->
+        replies by
+        <!-- {{ thread.contributorsCount }} -->
         contributors</span
       >
-    </p> 
+    </p>
 
     <post-list :posts="threadPosts" />
     <post-editor @save="addPost" />
@@ -71,12 +71,17 @@ export default {
     }
   },
   async created() {
-    // fetch the thread
-    // debugger;
-    // const id = this.id;
-    // const tA = this.$store.getters.thread(this.id);
-    // debugger;
-    //   const test = this.$store.state.threads;
-  }
-}
+    const id = this.id;
+    const thread = await this.$store.dispatch('fetchThread', { id });
+    // fetch user
+    this.$store.dispatch('fetchUser', { id: thread.userId });
+
+    //fetch the posts
+    thread.posts.forEach(async (pId) => {
+      const post = await this.$store.dispatch('fetchPost', { id: pId });
+        // fetch the user for each post
+      this.$store.dispatch('fetchUser', { id: post.userId });
+    });
+  },
+};
 </script>
