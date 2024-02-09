@@ -138,6 +138,19 @@ export default createStore({
     fetchPosts({dispatch}, { ids }){
       return dispatch("fetchItems", { ids, resource: "posts"});
     },
+    fetchForums({dispatch}, { ids }){
+      return dispatch("fetchItems", { ids, resource: "forums"});
+    },
+    fetchCategories({commit}){
+      return  new Promise((resolve) => {
+        getFirebaseResource('categories').then(categories => {
+          categories.forEach(item => {
+            commit('setItem', { resource: 'categories', item })
+          });
+          resolve(categories);
+        })
+      })
+    },
     fetchItem({commit}, { id, resource }){
       return new Promise((resolve) => {
         const docPost = doc(db, resource, id);
@@ -192,7 +205,6 @@ async function getFirebaseResource(resource) {
   const q = collection(db, resource);
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
-    // doc.data() is never undefined for query doc snapshots
     arr.push({ ...doc.data(), id: doc.id });
   });
   return arr;

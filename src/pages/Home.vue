@@ -15,5 +15,10 @@ export default {
       return this.$store.state.categories;
     },
   },
+  async beforeCreate(){
+    const categories = await this.$store.dispatch('fetchCategories');
+    const forumsIds = categories.map(c => c.forums).flat();
+    this.$store.dispatch('fetchForums', { ids: forumsIds});
+  }
 };
 </script>
