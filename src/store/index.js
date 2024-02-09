@@ -129,6 +129,15 @@ export default createStore({
     fetchPost({dispatch}, { id }){
       return dispatch("fetchItem", { id, resource: "posts"});
     },
+    fetchThreads({dispatch}, { ids }){
+      return dispatch("fetchItems", { ids, resource: "threads"});
+    },
+    fetchUsers({dispatch}, { ids }){
+      return dispatch("fetchItems", { ids, resource: "users"});
+    },
+    fetchPosts({dispatch}, { ids }){
+      return dispatch("fetchItems", { ids, resource: "posts"});
+    },
     fetchItem({commit}, { id, resource }){
       return new Promise((resolve) => {
         const docPost = doc(db, resource, id);
@@ -141,6 +150,9 @@ export default createStore({
         });
       });
     },
+    fetchItems({ dispatch }, { ids, resource }){
+      return Promise.all(ids.map( id => dispatch('fetchItem', { id, resource } )));
+    }
   },
   mutations: {
     setItem(state, { resource, item }){
