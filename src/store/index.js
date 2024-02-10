@@ -57,6 +57,7 @@ export default createStore({
     thread: (state) => {
       return (id) => {
         const thread = findById(state.threads, id);
+        if(!thread) return {};
         return {
           ...thread,
           /* get author() {
@@ -120,6 +121,16 @@ export default createStore({
 
       return findById(state.threads, id);
     },
+
+    //////////////////////////////////////////////////////////
+    // Fetch Single Resource
+    /////////////////////////////////////////////////////////
+    fetchCategory({dispatch}, { id }){
+      return dispatch("fetchItem", { id, resource: "categories"});
+    },
+    fetchForum({dispatch}, { id }){
+      return dispatch("fetchItem", { id, resource: "forums"});
+    },
     fetchThread({dispatch}, { id }){
       return dispatch("fetchItem", { id, resource: "threads"});
     },
@@ -128,6 +139,15 @@ export default createStore({
     },
     fetchPost({dispatch}, { id }){
       return dispatch("fetchItem", { id, resource: "posts"});
+    },
+    //////////////////////////////////////////////////////////
+    // Fetch Multiple Resource
+    /////////////////////////////////////////////////////////
+    fetchCategories({dispatch}, { ids }){
+      return dispatch("fetchItems", { ids, resource: "categories"});
+    },
+    fetchForums({dispatch}, { ids }){
+      return dispatch("fetchItems", { ids, resource: "forums"});
     },
     fetchThreads({dispatch}, { ids }){
       return dispatch("fetchItems", { ids, resource: "threads"});
@@ -138,10 +158,7 @@ export default createStore({
     fetchPosts({dispatch}, { ids }){
       return dispatch("fetchItems", { ids, resource: "posts"});
     },
-    fetchForums({dispatch}, { ids }){
-      return dispatch("fetchItems", { ids, resource: "forums"});
-    },
-    fetchCategories({commit}){
+    fetchAllCategories({commit}){
       return  new Promise((resolve) => {
         getFirebaseResource('categories').then(categories => {
           categories.forEach(item => {

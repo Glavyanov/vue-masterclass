@@ -49,7 +49,7 @@ export default {
           return this.$store.state.posts.find((p) => p.id === id);
         },
         userById(id){
-          return this.$store.state.users.find((p) => p.id === id);
+          return this.$store.state.users.find((p) => p.id === id) || {};
         } 
     },
 };
