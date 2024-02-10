@@ -1,7 +1,7 @@
 <template>
-  <div class="col-full push-top">
+  <div v-if="forum" class="col-full push-top">
     <h1>
-      Create new Thread in<i>{{ forum.name }}</i>
+      Create new Thread in <i>{{ forum.name }}</i>
     </h1>
 
     <ThreadEditor @save="save" @cancel="cancel" />
@@ -38,5 +38,8 @@ export default {
       return this.$store.state.forums.find((f) => f.id === this.forumId);
     },
   },
+  created(){
+    this.$store.dispatch('fetchForum', { id: this.forumId })
+  }
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="col-full push-top">
+  <div v-if="thread && text" class="col-full push-top">
     <h1>
       Editing <i>{{ thread.title }}</i>
     </h1>
@@ -43,9 +43,13 @@ export default {
       return this.$store.state.threads.find((t) => t.id === this.id);
     },
     text() {
-      return this.$store.state.posts.find((p) => p.id === this.thread.posts[0])
-        .text;
+      const post = this.$store.state.posts.find((p) => p.id === this.thread.posts[0]);
+      return post ? post.text : '';
     },
   },
+  async created(){
+    const thread = await this.$store.dispatch('fetchThread', { id: this.id });
+    this.$store.dispatch('fetchPost', { id: thread.posts[0]});
+  }
 };
 </script>
