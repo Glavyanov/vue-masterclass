@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import axios from "axios";
-import { sitekey, secretkey } from "@/config/recaptcha";
+//import axios from "axios";
+import { sitekey,/*  secretkey  */} from "@/config/recaptcha";
 
 export default {
   data() {
@@ -50,7 +50,7 @@ export default {
         text: this.text,
       };
 
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 2000);

@@ -27,7 +27,6 @@ export default {
   },
   computed: {
     forum() {
-      const t =  this.$store.state.forums.find((forum) => forum.id === this.id);
       return this.$store.state.forums.find((forum) => forum.id === this.id);
     },
     threads() {
