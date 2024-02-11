@@ -19,9 +19,9 @@
         class="hide-mobile text-faded text-small"
         style="float: right; margin-top: 2px"
       >
-        <!-- {{ thread.repliesCount }} -->
+        {{ thread.repliesCount }}
         replies by
-        <!-- {{ thread.contributorsCount }} -->
+        {{ thread.contributorsCount }}
         contributors</span
       >
     </p>

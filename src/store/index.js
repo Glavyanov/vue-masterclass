@@ -53,7 +53,7 @@ export default createStore({
         if (!thread) return {};
         return {
           ...thread,
-          /* get author() {
+          get author() {
             return findById(state.users, thread.userId);
           },
           get repliesCount() {
@@ -61,7 +61,7 @@ export default createStore({
           },
           get contributorsCount() {
             return thread.contributors.length;
-          }, */
+          },
         };
       };
     },
@@ -107,22 +107,41 @@ export default createStore({
       return thread;
     },
     async createThread({ commit, state, dispatch }, { title, text, forumId }) {
-      const id = "foo" + Math.random();
       const userId = state.authId;
-      const publishedAt = Math.floor(Date.now() / 1000);
+      const publishedAt = firebase.firestore.FieldValue.serverTimestamp();
+      const threadRef = db.collection('threads').doc();
       const thread = {
         forumId,
         title,
-        id,
+        id: threadRef.id,
         publishedAt,
         userId,
       };
-      commit("setItem", { resource: "threads", item: thread });
-      commit("appendThreadToUser", { parentId: userId, childId: id });
-      commit("appendThreadToForum", { parentId: forumId, childId: id });
-      dispatch("createPost", { text, threadId: id });
 
-      return findById(state.threads, id);
+      const userRef = db.collection('users').doc(userId);
+      const forumRef = db.collection('forums').doc(forumId);
+      const batch = db.batch();
+      batch.set(threadRef, thread);
+      batch.update(userRef, {
+        threads: firebase.firestore.FieldValue.arrayUnion(threadRef.id),
+      });
+      batch.update(userRef, {
+        threads: firebase.firestore.FieldValue.arrayUnion(threadRef.id),
+      });
+      batch.update(forumRef, {
+        threads: firebase.firestore.FieldValue.arrayUnion(threadRef.id),
+      });
+
+      await batch.commit();
+
+      const newThread = await threadRef.get();
+
+      commit("setItem", { resource: "threads", item: { ...newThread.data(), id: newThread.id } });
+      commit("appendThreadToUser", { parentId: userId, childId: threadRef.id });
+      commit("appendThreadToForum", { parentId: forumId, childId: threadRef.id });
+      await dispatch("createPost", { text, threadId: threadRef.id });
+
+      return findById(state.threads, threadRef.id);
     },
 
     //////////////////////////////////////////////////////////

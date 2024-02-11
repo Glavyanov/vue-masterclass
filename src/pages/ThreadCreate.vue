@@ -26,7 +26,6 @@ export default {
         text,
         forumId: this.forum.id,
       });
-
       this.$router.push({ name: "ThreadShow", params: { id: thread.id } });
     },
     cancel() {
