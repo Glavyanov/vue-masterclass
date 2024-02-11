@@ -69,7 +69,7 @@ export default createStore({
   actions: {
     async createPost({ commit, state }, post) {
       post.userId = state.authId;
-      post.publishedAt = Math.floor(Date.now() / 1000);
+      post.publishedAt = firebase.firestore.FieldValue.serverTimestamp();
       const batch = db.batch();
       const postRef = db.collection('posts').doc();
       const threadRef = db.collection('threads').doc(post.threadId);
@@ -81,10 +81,11 @@ export default createStore({
 
       await batch.commit();
       
-      commit("setItem", { resource: "posts", item: { ...post, id: postRef.id} });
+      const newPost = await postRef.get();
+      commit("setItem", { resource: "posts", item: { ...newPost.data(), id: newPost.id} });
       commit("appendPostToThread", {
         parentId: post.threadId,
-        childId: postRef.id,
+        childId: newPost.id,
       });
       commit("appendContributorToThread", {
         parentId: post.threadId,
