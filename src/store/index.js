@@ -1,18 +1,11 @@
 import { createStore } from "vuex";
 import { findById, upsert } from "@/helpers";
 import firebaseConfig from "@/config/firebase";
-import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  setDoc,
-  getDoc,
-  doc,
-} from "firebase/firestore";
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
 
-const firebase = initializeApp(firebaseConfig);
-const db = getFirestore(firebase);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 export default createStore({
   state: {
@@ -24,9 +17,9 @@ export default createStore({
     authId: "VXjpr2WHa8Ux4Bnggym8QFLdv5C3",
   },
   getters: {
-    /* authUser: (state, getters) => {
+    authUser: (state, getters) => {
       return getters.user(state.authId);
-    }, */
+    },
     user: (state) => {
       return (id) => {
         const user = findById(state.users, id);
@@ -35,7 +28,7 @@ export default createStore({
         }
         return {
           ...user,
-/* 
+          /* 
           get posts() {
             return state.posts.filter((p) => p.userId === user.id);
           },
@@ -57,7 +50,7 @@ export default createStore({
     thread: (state) => {
       return (id) => {
         const thread = findById(state.threads, id);
-        if(!thread) return {};
+        if (!thread) return {};
         return {
           ...thread,
           /* get author() {
@@ -74,19 +67,28 @@ export default createStore({
     },
   },
   actions: {
-    createPost({ commit, state }, post) {
-      const postId = "foo" + Math.random();
-      post.id = postId;
+    async createPost({ commit, state }, post) {
       post.userId = state.authId;
       post.publishedAt = Math.floor(Date.now() / 1000);
-      commit("setItem", { resource: "posts", item: post });
+      const batch = db.batch();
+      const postRef = db.collection('posts').doc();
+      const threadRef = db.collection('threads').doc(post.threadId);
+      batch.set(postRef, post);
+      batch.update(threadRef, {
+        posts: firebase.firestore.FieldValue.arrayUnion(postRef.id),
+        contributors: firebase.firestore.FieldValue.arrayUnion(state.authId)
+      });
+
+      await batch.commit();
+      
+      commit("setItem", { resource: "posts", item: { ...post, id: postRef.id} });
       commit("appendPostToThread", {
         parentId: post.threadId,
-        childId: postId,
+        childId: postRef.id,
       });
       commit("appendContributorToThread", {
         parentId: post.threadId,
-        childId: post.userId,
+        childId: state.authId,
       });
     },
     updateUser({ commit }, user) {
@@ -125,67 +127,74 @@ export default createStore({
     //////////////////////////////////////////////////////////
     // Fetch Single Resource
     /////////////////////////////////////////////////////////
-    fetchCategory({dispatch}, { id }){
-      return dispatch("fetchItem", { id, resource: "categories"});
+    fetchCategory({ dispatch }, { id }) {
+      return dispatch("fetchItem", { id, resource: "categories" });
     },
-    fetchForum({dispatch}, { id }){
-      return dispatch("fetchItem", { id, resource: "forums"});
+    fetchForum({ dispatch }, { id }) {
+      return dispatch("fetchItem", { id, resource: "forums" });
     },
-    fetchThread({dispatch}, { id }){
-      return dispatch("fetchItem", { id, resource: "threads"});
+    fetchThread({ dispatch }, { id }) {
+      return dispatch("fetchItem", { id, resource: "threads" });
     },
-    fetchUser({dispatch}, { id }){
-      return dispatch("fetchItem", { id, resource: "users"});
+    fetchUser({ dispatch }, { id }) {
+      return dispatch("fetchItem", { id, resource: "users" });
     },
-    fetchPost({dispatch}, { id }){
-      return dispatch("fetchItem", { id, resource: "posts"});
+    fetchPost({ dispatch }, { id }) {
+      return dispatch("fetchItem", { id, resource: "posts" });
+    },
+    fetchAuthUser({ dispatch, state }) {
+      return dispatch("fetchItem", { id: state.authId, resource: "users" });
     },
     //////////////////////////////////////////////////////////
     // Fetch Multiple Resource
     /////////////////////////////////////////////////////////
-    fetchCategories({dispatch}, { ids }){
-      return dispatch("fetchItems", { ids, resource: "categories"});
+    fetchCategories({ dispatch }, { ids }) {
+      return dispatch("fetchItems", { ids, resource: "categories" });
     },
-    fetchForums({dispatch}, { ids }){
-      return dispatch("fetchItems", { ids, resource: "forums"});
+    fetchForums({ dispatch }, { ids }) {
+      return dispatch("fetchItems", { ids, resource: "forums" });
     },
-    fetchThreads({dispatch}, { ids }){
-      return dispatch("fetchItems", { ids, resource: "threads"});
+    fetchThreads({ dispatch }, { ids }) {
+      return dispatch("fetchItems", { ids, resource: "threads" });
     },
-    fetchUsers({dispatch}, { ids }){
-      return dispatch("fetchItems", { ids, resource: "users"});
+    fetchUsers({ dispatch }, { ids }) {
+      return dispatch("fetchItems", { ids, resource: "users" });
     },
-    fetchPosts({dispatch}, { ids }){
-      return dispatch("fetchItems", { ids, resource: "posts"});
+    fetchPosts({ dispatch }, { ids }) {
+      return dispatch("fetchItems", { ids, resource: "posts" });
     },
-    fetchAllCategories({commit}){
-      return  new Promise((resolve) => {
-        getFirebaseResource('categories').then(categories => {
-          categories.forEach(item => {
-            commit('setItem', { resource: 'categories', item })
+    fetchAllCategories({ commit }) {
+      return new Promise((resolve) => {
+        getFirebaseResource("categories").then((categories) => {
+          categories.forEach((item) => {
+            commit("setItem", { resource: "categories", item });
           });
           resolve(categories);
-        })
-      })
-    },
-    fetchItem({commit}, { id, resource }){
-      return new Promise((resolve) => {
-        const docPost = doc(db, resource, id);
-        getDoc(docPost).then((res) => {
-          if (res.exists()) {
-            const item = { ...res.data(), id: res.id };
-            commit("setItem", { resource, item });
-            resolve(item);
-          }
         });
       });
     },
-    fetchItems({ dispatch }, { ids, resource }){
-      return Promise.all(ids.map( id => dispatch('fetchItem', { id, resource } )));
-    }
+    fetchItem({ commit }, { id, resource }) {
+      return new Promise((resolve) => {
+        db.collection(resource)
+          .doc(id)
+          .get()
+          .then((res) => {
+            if (res.exists) {
+              const item = { ...res.data(), id: res.id };
+              commit("setItem", { resource, item });
+              resolve(item);
+            }
+          });
+      });
+    },
+    fetchItems({ dispatch }, { ids, resource }) {
+      return Promise.all(
+        ids.map((id) => dispatch("fetchItem", { id, resource }))
+      );
+    },
   },
   mutations: {
-    setItem(state, { resource, item }){
+    setItem(state, { resource, item }) {
       upsert(state[resource], item);
     },
     appendPostToThread: makeAppendChildToParentMutation({
@@ -210,7 +219,7 @@ export default createStore({
 function makeAppendChildToParentMutation({ parent, child }) {
   return (state, { parentId, childId }) => {
     const resource = findById(state[parent], parentId);
-    if(!resource) return;
+    if (!resource) return;
     resource[child] ||= [];
     if (!resource[child].includes(childId)) {
       resource[child].push(childId);
@@ -219,17 +228,15 @@ function makeAppendChildToParentMutation({ parent, child }) {
 }
 
 async function getFirebaseResource(resource) {
-  const arr = [];
-  const q = collection(db, resource);
-  const querySnapshot = await getDocs(q);
-  querySnapshot.forEach((doc) => {
-    arr.push({ ...doc.data(), id: doc.id });
-  });
-  return arr;
-}
-
-async function setFirebaseResource(resources, resource) {
-  await setDoc(doc(db, resources, resource.id), {
-    ...resource,
+  return new Promise((resolve) => {
+    db.collection(resource)
+      .get()
+      .then((querySnapshot) => {
+        const arr = [];
+        querySnapshot.forEach((doc) => {
+          arr.push({ ...doc.data(), id: doc.id });
+        });
+        resolve(arr);
+      });
   });
 }

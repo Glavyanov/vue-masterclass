@@ -51,46 +51,49 @@ export default {
       };
 
       new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve();
+        }, 2000);
         /* eslint-disable */
-        grecaptcha.ready(function () {
-          grecaptcha
-            .execute(sitekey, {
-              action: "feedback",
-            })
-            .then(function (token) {
-              if (token) {
-                axios
-                  .post(
-                    `https://www.google.com/recaptcha/api/siteverify?secret=${secretkey}&response=${token}`
-                  )
-                  .then((response) => {
-                    const result = response.data;
-                    if (result?.success && result?.score >= 0.9) {
-                      resolve(token);
-                    } else {
-                      reject(alert("ERROR in Post data!!!"));
-                    }
-                  });
-                // (async function (tokenValue) {
-                //   debugger;
-                //   const res = await fetch(
-                //     `https://www.google.com/recaptcha/api/siteverify?secret=SECRETKEY&response=${tokenValue}`,
-                //     {
-                //       method: "POST",
-                //       mode: "no-cors",
-                //     }
-                //   );
-                //   console.log(res);
-                //   document.getElementById("recaptcha").value = res.body;
-                // })(token);
-              }
-            });
-        });
+        // grecaptcha.ready(function () {
+        //   grecaptcha
+        //     .execute(sitekey, {
+        //       action: "feedback",
+        //     })
+        //     .then(function (token) {
+        //       if (token) {
+        //         axios
+        //           .post(
+        //             `https://www.google.com/recaptcha/api/siteverify?secret=${secretkey}&response=${token}`
+        //           )
+        //           .then((response) => {
+        //             const result = response.data;
+        //             if (result?.success && result?.score >= 0.9) {
+        //               resolve(token);
+        //             } else {
+        //               reject(alert("ERROR in Post data!!!"));
+        //             }
+        //           }).catch((err)=> alert(err));
+        //         // (async function (tokenValue) {
+        //         //   debugger;
+        //         //   const res = await fetch(
+        //         //     `https://www.google.com/recaptcha/api/siteverify?secret=SECRETKEY&response=${tokenValue}`,
+        //         //     {
+        //         //       method: "POST",
+        //         //       mode: "no-cors",
+        //         //     }
+        //         //   );
+        //         //   console.log(res);
+        //         //   document.getElementById("recaptcha").value = res.body;
+        //         // })(token);
+        //       }
+        //     });
+        // });
       })
-        .then((result) => {
+        .then(() => {
           this.$emit("save", { post });
           this.text = "";
-          this.recaptchaToken = result;
+          this.recaptchaToken = '';
         })
         .catch((err) => {
           console.log(err);

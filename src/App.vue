@@ -6,10 +6,17 @@
 </template>
 
 <script>
-import TheNavbar from '@/components/TheNavbar'
+import TheNavbar from '@/components/TheNavbar';
+import { mapActions } from 'vuex';
 export default {
   name: 'App',
-  components: { TheNavbar }
+  components: { TheNavbar },
+  methods: {
+    ...mapActions(['fetchAuthUser'])
+  },
+  async created(){
+    await this.fetchAuthUser();
+  }
 }
 </script>
 
