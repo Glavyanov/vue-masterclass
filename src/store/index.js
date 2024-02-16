@@ -28,13 +28,14 @@ export default createStore({
         }
         return {
           ...user,
-          /* 
+          
           get posts() {
             return state.posts.filter((p) => p.userId === user.id);
           },
 
           get postsCount() {
-            return this.posts.length;
+            //return this.posts.length;
+            return user.postsCount || 0;
           },
 
           get threads() {
@@ -42,8 +43,8 @@ export default createStore({
           },
 
           get threadsCount() {
-            return this.threads.length;
-          }, */
+            return user.threads?.length || 0;
+          },
         };
       };
     },
@@ -73,10 +74,14 @@ export default createStore({
       const batch = db.batch();
       const postRef = db.collection('posts').doc();
       const threadRef = db.collection('threads').doc(post.threadId);
+      const userRef = db.collection('users').doc(state.authId);
       batch.set(postRef, post);
       batch.update(threadRef, {
         posts: firebase.firestore.FieldValue.arrayUnion(postRef.id),
         contributors: firebase.firestore.FieldValue.arrayUnion(state.authId)
+      });
+      batch.update(userRef, {
+        postsCount: firebase.firestore.FieldValue.increment(1),
       });
 
       await batch.commit();
