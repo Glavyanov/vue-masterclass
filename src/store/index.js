@@ -1,5 +1,5 @@
 import { createStore } from "vuex";
-import { findById, upsert } from "@/helpers";
+import { findById, upsert, docToResource } from "@/helpers";
 import firebaseConfig from "@/config/firebase";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
@@ -103,13 +103,22 @@ export default createStore({
     async updateThread({ commit, state }, { title, text, id }) {
       const thread = findById(state.threads, id);
       const post = findById(state.posts, thread.posts[0]);
-      const newThread = { ...thread, title };
-      const newPost = { ...post, text };
+      let newThread = { ...thread, title };
+      let newPost = { ...post, text };
+      const threadRef = db.collection('threads').doc(id);
+      const postRef = db.collection('posts').doc(post.id);
+      const batch = db.batch();
+      batch.update(threadRef, newThread);
+      batch.update(postRef, newPost);
+
+      await batch.commit();
+      newThread = await threadRef.get();
+      newPost = await postRef.get();
 
       commit("setItem", { resource: "threads", item: newThread });
       commit("setItem", { resource: "posts", item: newPost });
 
-      return thread;
+      return docToResource(newThread);
     },
     async createThread({ commit, state, dispatch }, { title, text, forumId }) {
       const userId = state.authId;
@@ -220,7 +229,7 @@ export default createStore({
   },
   mutations: {
     setItem(state, { resource, item }) {
-      upsert(state[resource], item);
+      upsert(state[resource], docToResource(item));
     },
     appendPostToThread: makeAppendChildToParentMutation({
       parent: "threads",
