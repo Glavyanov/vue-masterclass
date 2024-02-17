@@ -53,7 +53,7 @@ export default {
   methods: {
     save() {
       const post = {
-        text: this.localPost.text,
+        ...this.localPost
       };
 
       new Promise((resolve) => {

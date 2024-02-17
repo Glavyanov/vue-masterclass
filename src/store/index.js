@@ -97,6 +97,20 @@ export default createStore({
         childId: state.authId,
       });
     },
+    async updatePost({commit, state}, { text, id}){
+      const post = {
+        text,
+        edited: {
+          at: firebase.firestore.FieldValue.serverTimestamp(),
+          by: state.authId,
+          moderated: false
+        }
+      }
+      const postRef = db.collection('posts').doc(id);
+      await postRef.update(post);
+      const updatedPost = await postRef.get()
+      commit("setItem", { resource: "posts", item: updatedPost });
+    },
     updateUser({ commit }, user) {
       commit("setItem", { resource: "users", item: user });
     },
