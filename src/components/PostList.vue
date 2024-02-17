@@ -22,6 +22,9 @@
             {{ post?.text }}
           </p>
         </div>
+        <a href="#" style="margin-left: auto; padding-left: 10px;" class="link-unstyled">
+          <fa icon="pencil-alt"></fa>
+        </a>
       </div>
       <div class="post-date text-faded">
         <app-date :timeStamp="post?.publishedAt" />
