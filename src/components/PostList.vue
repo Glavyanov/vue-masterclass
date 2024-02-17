@@ -17,12 +17,15 @@
       </div>
 
       <div class="post-content">
-        <div>
-          <p>
+        <div class="col-full">
+          <PostEditor v-if="editing === post.id" :post="post"/>
+          <p v-else>
             {{ post?.text }}
           </p>
         </div>
-        <a href="#" style="margin-left: auto; padding-left: 10px;" class="link-unstyled">
+        <a 
+          @click.prevent="toggleEditingMode(post.id)"
+          href="#" style="margin-left: auto; padding-left: 10px;" class="link-unstyled">
           <fa icon="pencil-alt"></fa>
         </a>
       </div>
@@ -33,6 +36,7 @@
   </div>
 </template>
 <script>
+import PostEditor from "@/components/PostEditor.vue";
 
 export default {
   props: {
@@ -41,10 +45,21 @@ export default {
       type: Array,
     },
   },
+  components : {
+    PostEditor
+  },
+  data(){
+    return{
+      editing: null,
+    }
+  },
   methods: {
     userById(id){
       return this.$store.getters.user(id);
-    } 
+    },
+    toggleEditingMode(id){
+      this.editing = id === this.editing ? null : id;
+    }
   },
 };
 </script>

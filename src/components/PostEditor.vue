@@ -8,14 +8,14 @@
           cols="30"
           rows="10"
           class="form-input"
-          v-model="text"
+          v-model="localPost.text"
         />
       </div>
       <div class="form-actions">
-        <button class="btn-blue">Submit post</button>
+        <button class="btn-blue">{{ localPost.id ? 'Edit post' : 'Submit post' }}</button>
       </div>
     </form>
-    <component
+    <!-- <component
       :src="`https://www.google.com/recaptcha/api.js?render=${sitekey}`"
       :is="'script'"
     ></component>
@@ -28,7 +28,7 @@
         class="form-input"
         v-model="recaptchaToken"
       />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -37,17 +37,23 @@
 import { sitekey,/*  secretkey  */} from "@/config/recaptcha";
 
 export default {
+  props:{
+    post: {
+      type: Object,
+      default: () => ({ text: null}),
+    }
+  },
   data() {
     return {
-      text: "",
       recaptchaToken: "",
       sitekey,
+      localPost: { ...this.post },
     };
   },
   methods: {
     save() {
       const post = {
-        text: this.text,
+        text: this.localPost.text,
       };
 
       new Promise((resolve) => {
@@ -92,8 +98,8 @@ export default {
       })
         .then(() => {
           this.$emit("save", { post });
-          this.text = "";
-          this.recaptchaToken = '';
+          this.localPost.text = "";
+          this.recaptchaToken = "";
         })
         .catch((err) => {
           console.log(err);
