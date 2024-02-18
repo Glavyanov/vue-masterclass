@@ -2,7 +2,7 @@
   <the-navbar />
   <div class="container">
     <div class="col-full" style="flex-direction: column">
-      <router-view v-show="showPage" @ready="showPage = true" />
+      <router-view v-show="showPage" @ready="onPageReady" />
       <AppSpinner v-show="!showPage" />
     </div>
   </div>
@@ -11,6 +11,7 @@
 <script>
 import TheNavbar from "@/components/TheNavbar";
 import { mapActions } from "vuex";
+import NProgress from "nprogress";
 
 export default {
   name: "App",
@@ -22,23 +23,26 @@ export default {
   },
   methods: {
     ...mapActions(["fetchAuthUser"]),
+    onPageReady() {
+      this.showPage = true;
+      NProgress.done();
+    }
   },
   async created() {
+    NProgress.configure({
+      speed: 200,
+      showSpinner: false,
+    });
     await this.fetchAuthUser();
     this.$router.beforeEach(() => {
       this.showPage = false;
+      NProgress.start();
     });
   },
 };
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+@import "assets/app.css";
+@import "nprogress/nprogress.css";
 </style>
