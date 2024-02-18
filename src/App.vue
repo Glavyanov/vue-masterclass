@@ -1,23 +1,35 @@
 <template>
-  <the-navbar/>
+  <the-navbar />
   <div class="container">
-    <router-view />
+    <div class="col-full" style="flex-direction: column">
+      <router-view v-show="showPage" @ready="showPage = true" />
+      <AppSpinner v-show="!showPage" />
+    </div>
   </div>
 </template>
 
 <script>
-import TheNavbar from '@/components/TheNavbar';
-import { mapActions } from 'vuex';
+import TheNavbar from "@/components/TheNavbar";
+import { mapActions } from "vuex";
+
 export default {
-  name: 'App',
+  name: "App",
   components: { TheNavbar },
-  methods: {
-    ...mapActions(['fetchAuthUser'])
+  data() {
+    return {
+      showPage: false,
+    };
   },
-  async created(){
+  methods: {
+    ...mapActions(["fetchAuthUser"]),
+  },
+  async created() {
     await this.fetchAuthUser();
-  }
-}
+    this.$router.beforeEach(() => {
+      this.showPage = false;
+    });
+  },
+};
 </script>
 
 <style>

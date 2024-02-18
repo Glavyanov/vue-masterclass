@@ -1,5 +1,5 @@
 <template>
-  <div class="col-large push-top" v-if="thread">
+  <div class="col-large push-top" v-if="asyncDataStatus_ready">
     <h1>
       {{ thread.title }}
       <router-link
@@ -34,12 +34,14 @@
 <script>
 import PostList from "@/components/PostList.vue";
 import PostEditor from "@/components/PostEditor.vue";
+import asyncDataStatus from "@/mixins/asyncDataStatus";
 
 export default {
   components: {
     PostList,
     PostEditor,
   },
+  mixins: [asyncDataStatus],
   props: {
     id: {
       required: true,
@@ -74,14 +76,15 @@ export default {
     const id = this.id;
     const thread = await this.$store.dispatch('fetchThread', { id });
     // fetch user
-    this.$store.dispatch('fetchUser', { id: thread.userId });
+    await this.$store.dispatch('fetchUser', { id: thread.userId });
 
     //fetch the posts
     const posts = await this.$store.dispatch("fetchPosts", {ids: thread.posts});
     //fetch the users associated with the posts.
     const usersIds = posts.map( p => p.userId );
-    this.$store.dispatch("fetchUsers", { ids: usersIds });
-
+    await this.$store.dispatch("fetchUsers", { ids: usersIds });
+    this.asyncDataStatus_fetched();
+    
   },
 };
 </script>

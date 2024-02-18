@@ -4,3 +4,11 @@
     <router-link :to="{name: 'Home'}" text="Go to home page"/>
   </div>
 </template>
+
+<script>
+  export default {
+    created(){
+      this.$emit("ready");
+    }
+  }
+</script>
