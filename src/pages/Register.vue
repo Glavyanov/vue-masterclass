@@ -59,7 +59,7 @@ export default {
   },
   methods: {
     async register () {
-      await this.$store.dispatch("createUser", this.form);
+      await this.$store.dispatch("registerUserWithEmailAndPassword", this.form);
       this.$router.push({name: "Home"});
     }
   },

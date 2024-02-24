@@ -1,8 +1,7 @@
 import { createStore } from "vuex";
 import { findById, upsert, docToResource } from "@/helpers";
 import firebaseConfig from "@/config/firebase";
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
+import firebase from "@/helpers/firebase";
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -14,7 +13,7 @@ export default createStore({
     threads: [],
     posts: [],
     users: [],
-    authId: "VXjpr2WHa8Ux4Bnggym8QFLdv5C3",
+    authId: null/* "VXjpr2WHa8Ux4Bnggym8QFLdv5C3" */,
   },
   getters: {
     authUser: (state, getters) => {
@@ -111,12 +110,16 @@ export default createStore({
       const updatedPost = await postRef.get()
       commit("setItem", { resource: "posts", item: updatedPost });
     },
-    async createUser({commit}, { name, username, email, avatar = null}){
+    async registerUserWithEmailAndPassword({dispatch}, {email, name, username, password, avatar = null }){
+      const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
+      await dispatch("createUser", { id: result.user.uid, email, name, username, avatar });
+    },
+    async createUser({commit}, { id, name, username, email, avatar = null}){
       const registeredAt = firebase.firestore.FieldValue.serverTimestamp();
       const usernameLower = username?.toLowerCase();
       email = email?.toLowerCase();
       const user = { avatar, name, username, email, usernameLower, registeredAt };
-      const userRef = db.collection("users").doc()
+      const userRef = db.collection("users").doc(id);
       userRef.set(user);
       const newUser = await userRef.get();
       commit("setItem", { resource: "users", item: newUser});
@@ -202,8 +205,11 @@ export default createStore({
     fetchPost({ dispatch }, { id }) {
       return dispatch("fetchItem", { id, resource: "posts" });
     },
-    fetchAuthUser({ dispatch, state }) {
-      return dispatch("fetchItem", { id: state.authId, resource: "users" });
+    fetchAuthUser({ dispatch, commit }) {
+      const id = firebase.auth().currentUser?.uid;
+      if(!id) return;
+      commit("setAuthId", { id });
+      return dispatch("fetchItem", { id, resource: "users" });
     },
     
     //////////////////////////////////////////////////////////
@@ -252,11 +258,14 @@ export default createStore({
       return Promise.all(
         ids.map((id) => dispatch("fetchItem", { id, resource }))
       );
-    },
+    }
   },
   mutations: {
     setItem(state, { resource, item }) {
       upsert(state[resource], docToResource(item));
+    },
+    setAuthId(state, { id }){
+      state.authId = id;
     },
     appendPostToThread: makeAppendChildToParentMutation({
       parent: "threads",
