@@ -111,6 +111,18 @@ export default createStore({
       const updatedPost = await postRef.get()
       commit("setItem", { resource: "posts", item: updatedPost });
     },
+    async createUser({commit}, { name, username, email, avatar = null}){
+      const registeredAt = firebase.firestore.FieldValue.serverTimestamp();
+      const usernameLower = username?.toLowerCase();
+      email = email?.toLowerCase();
+      const user = { avatar, name, username, email, usernameLower, registeredAt };
+      const userRef = db.collection("users").doc()
+      userRef.set(user);
+      const newUser = await userRef.get();
+      commit("setItem", { resource: "users", item: newUser});
+
+      return docToResource(newUser);
+    },
     updateUser({ commit }, user) {
       commit("setItem", { resource: "users", item: user });
     },
@@ -193,6 +205,7 @@ export default createStore({
     fetchAuthUser({ dispatch, state }) {
       return dispatch("fetchItem", { id: state.authId, resource: "users" });
     },
+    
     //////////////////////////////////////////////////////////
     // Fetch Multiple Resource
     /////////////////////////////////////////////////////////

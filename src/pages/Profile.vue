@@ -8,7 +8,7 @@
 
       <div class="col-7 push-top">
         <div class="profile-header">
-          <span class="text-lead"> {{ user.username }} recent activity </span>
+          <span class="text-lead"> {{ user?.username }} recent activity </span>
           <a href="#">See only started threads?</a>
         </div>
         <hr />
@@ -23,6 +23,7 @@ import PostList from "@/components/PostList.vue";
 import UserProfileCard from "@/components/UserProfileCard.vue";
 import UserProfileCardEditor from "@/components/UserProfileCardEditor.vue";
 import { mapGetters } from "vuex";
+import asyncDataStatus from "@/mixins/asyncDataStatus";
 
 export default {
   components: {
@@ -30,6 +31,7 @@ export default {
     UserProfileCard,
     UserProfileCardEditor,
   },
+  mixins:[asyncDataStatus],
   props: {
     edit: {
         type: Boolean,
@@ -39,5 +41,8 @@ export default {
   computed: {
     ...mapGetters({ user: "authUser" }),
   },
+  created () {
+    this.asyncDataStatus_fetched();
+  }
 };
 </script>
