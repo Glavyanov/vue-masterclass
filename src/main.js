@@ -7,7 +7,6 @@ import firebase from "@/helpers/firebase";
 
 firebase.auth().onAuthStateChanged( user => {
   if(user){
-    debugger;
     store.dispatch("fetchAuthUser");
   }
 });

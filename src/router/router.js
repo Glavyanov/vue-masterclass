@@ -5,6 +5,7 @@ import ThreadEdit from "@/pages/ThreadEdit";
 import Forum from "@/pages/Forum";
 import Category from "@/pages/Category";
 import Register from "@/pages/Register";
+import SignIn from "@/pages/SignIn";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
 import { createRouter, createWebHistory } from "vue-router";
@@ -19,6 +20,11 @@ const routes = [
     path: "/register",
     name: "Register",
     component: Register,
+  },
+  {
+    path: "/login",
+    name: "SignIn",
+    component: SignIn,
   },
   {
     path: "/profile",
