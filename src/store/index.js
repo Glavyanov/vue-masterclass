@@ -117,6 +117,16 @@ export default createStore({
     signInWithEmailAndPassword(context, { email, password } ){
       return firebase.auth().signInWithEmailAndPassword(email, password);
     },
+    async signInWithGoogle({dispatch}){
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const response = await firebase.auth().signInWithPopup(provider);
+      const user = response.user;
+      const userRef = db.collection('users').doc(user?.uid);
+      const userDoc = await userRef.get();
+      if(!userDoc.exists){
+        return dispatch("createUser", { id: user.uid, name: user.displayName, username: user.email, email: user.email, avatar: user.photoURL });
+      }
+    },
     async signOut({ commit }){
       await firebase.auth().signOut();
       commit("setAuthId", { id: null });
