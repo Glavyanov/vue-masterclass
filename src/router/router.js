@@ -9,6 +9,8 @@ import SignIn from "@/pages/SignIn";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
 import { createRouter, createWebHistory } from "vue-router";
+import store from "@/store";
+import NProgress from "nprogress";
 
 const routes = [
   {
@@ -37,6 +39,9 @@ const routes = [
     name: "ProfileEdit",
     component: Profile,
     props: { edit: true },
+    beforeEnter(){
+      if(!store.state.authId) return { name: "SignIn"};
+    },
   },
   {
     path: "/category/:id",
@@ -67,6 +72,15 @@ const routes = [
     name: "ThreadEdit",
     component: ThreadEdit,
     props: true,
+  },
+  {
+    path: "/logout",
+    name: "SignOut",
+    async beforeEnter(to, from, next){
+      await store.dispatch('signOut');
+      NProgress.done();
+      return { name: "Home" };
+    }
   },
   {
     path: "/:pathMatch(.*)*",

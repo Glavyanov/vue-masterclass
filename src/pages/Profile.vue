@@ -41,8 +41,8 @@ export default {
   computed: {
     ...mapGetters({ user: "authUser" }),
   },
-  created () {
+  created() {
     this.asyncDataStatus_fetched();
-  }
+  },
 };
 </script>

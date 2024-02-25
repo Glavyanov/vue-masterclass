@@ -33,7 +33,7 @@
             <div class="triangle-drop"></div>
             <ul class="dropdown-menu">
               <li class="dropdown-menu-item"><router-link :to="{ name: 'Profile' }">View profile</router-link></li>
-              <li class="dropdown-menu-item"><a @click.prevent="$store.dispatch('signOut')">Sign Out</a></li>
+              <li class="dropdown-menu-item"><router-link :to="{ name: 'SignOut' }">Sign Out</router-link></li>
             </ul>
           </div>
         </li>

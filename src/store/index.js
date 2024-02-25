@@ -177,14 +177,11 @@ export default createStore({
         publishedAt,
         userId,
       };
-
       const userRef = db.collection('users').doc(userId);
       const forumRef = db.collection('forums').doc(forumId);
       const batch = db.batch();
+      
       batch.set(threadRef, thread);
-      batch.update(userRef, {
-        threads: firebase.firestore.FieldValue.arrayUnion(threadRef.id),
-      });
       batch.update(userRef, {
         threads: firebase.firestore.FieldValue.arrayUnion(threadRef.id),
       });
@@ -193,7 +190,6 @@ export default createStore({
       });
 
       await batch.commit();
-
       const newThread = await threadRef.get();
 
       commit("setItem", { resource: "threads", item: { ...newThread.data(), id: newThread.id } });

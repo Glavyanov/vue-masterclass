@@ -3,7 +3,7 @@
     <div class="form-group">
       <label for="thread_title">Title:</label>
       <input
-        v-model="activeTitle"
+        v-model="form.activeTitle"
         type="text"
         id="thread_title"
         class="form-input"
@@ -14,7 +14,7 @@
     <div class="form-group">
       <label for="thread_content">Content:</label>
       <textarea
-        v-model="activeText"
+        v-model="form.activeText"
         id="thread_content"
         class="form-input"
         name="content"
@@ -50,8 +50,10 @@ export default {
   },
   data() {
     return {
-      activeTitle: this.title,
-      activeText: this.text,
+      form: {
+        activeTitle: this.title,
+        activeText: this.text,
+      }
     };
   },
   computed: {
@@ -61,8 +63,21 @@ export default {
   },
   methods: {
     save() {
-      this.$emit("save", { title: this.activeTitle, text: this.activeText });
+      this.$emit("clean");
+      this.$emit("save", { title: this.form.activeTitle , text: this.form.activeText });
     },
   },
+  watch: {
+    form: {
+      handler(){
+        if(this.form.activeTitle !== this.title || this.form.activeText !== this.text){
+          this.$emit("dirty");
+        } else {
+          this.$emit("clean");
+        }
+      },      
+      deep: true
+    }
+  }
 };
 </script>

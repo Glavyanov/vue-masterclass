@@ -6,7 +6,7 @@
       <div v-for="thread in threads" :key="thread.id" class="thread">
         <div>
           <p>
-            <router-link :to="{name: 'ThreadShow', params: { id: thread.id}}" :text="thread.title"/>
+            <router-link :to="{ name: 'ThreadShow', params: { id: thread.id}}" :text="thread.title"/>
           </p>
           <p class="text-faded text-xsmall">
             By <a href="#">{{ userById(thread.userId).name }}</a
