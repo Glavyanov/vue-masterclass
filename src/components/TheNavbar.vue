@@ -5,59 +5,46 @@
     </router-link>
 
     <div class="btn-hamburger">
-      <!-- use .btn-humburger-active to open the menu -->
+      <!-- use .btn-hamburger-active to open the menu -->
       <div class="top bar"></div>
       <div class="middle bar"></div>
       <div class="bottom bar"></div>
     </div>
 
-    <!-- use .navbar-open to open nav -->
     <nav class="navbar">
       <ul>
         <li v-if="authUser" class="navbar-user">
-          <router-link :to="{name: 'Profile'}">
+          <a @click.prevent="userDropDownOpen = !userDropDownOpen">
             <img
               class="avatar-small"
               :src="authUser.avatar"
               :alt="`${authUser.name} profile picture`"
             />
             <span>
-                {{ authUser.name }}
+              {{ authUser.name }}
               <img
                 class="icon-profile"
                 src="../assets/svg/vueschool-logo.svg"
                 alt=""
               />
             </span>
-          </router-link>
-
-          <!-- dropdown menu -->
-          <!-- add class "active-drop" to show the dropdown -->
-          <div id="user-dropdown">
+          </a>
+          <div id="user-dropdown" :class="{'active-drop': userDropDownOpen}">
             <div class="triangle-drop"></div>
             <ul class="dropdown-menu">
-              <li class="dropdown-menu-item">
-                <a href="profile.html">View profile</a>
-              </li>
-              <li class="dropdown-menu-item"><a href="#">Log out</a></li>
+              <li class="dropdown-menu-item"><router-link :to="{ name: 'Profile' }">View profile</router-link></li>
+              <li class="dropdown-menu-item"><a @click.prevent="$store.dispatch('signOut')">Sign Out</a></li>
             </ul>
           </div>
         </li>
-        <li v-if="authUser" class="navbar-item">
-          <a @click.prevent="$store.dispatch('signOut')">Sign Out</a>
-        </li>
         <li v-if="!authUser" class="navbar-item">
           <router-link :to="{ name: 'SignIn' }">
-            <span>
-                Sign In
-            </span>
+            <span> Sign In </span>
           </router-link>
         </li>
         <li v-if="!authUser" class="navbar-item">
           <router-link :to="{ name: 'Register' }">
-            <span>
-                Register
-            </span>
+            <span> Register </span>
           </router-link>
         </li>
       </ul>
@@ -69,8 +56,13 @@
 import { mapGetters } from "vuex";
 
 export default {
-    computed: {
-        ...mapGetters(['authUser'])
+  data(){
+    return {
+      userDropDownOpen: false,
     }
-}
+  },
+  computed: {
+    ...mapGetters(["authUser"]),
+  },
+};
 </script>
