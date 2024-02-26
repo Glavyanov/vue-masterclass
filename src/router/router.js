@@ -76,9 +76,11 @@ const routes = [
   {
     path: "/logout",
     name: "SignOut",
-    async beforeEnter(to, from, next){
+    async beforeEnter( _, from){
       await store.dispatch('signOut');
-      NProgress.done();
+      if(from.path === "/"){
+        NProgress.done();
+      }
       return { name: "Home" };
     }
   },
