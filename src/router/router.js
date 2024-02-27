@@ -32,16 +32,14 @@ const routes = [
     path: "/profile",
     name: "Profile",
     component: Profile,
-    meta: { toTop: true, smoothScroll: true },
+    meta: { toTop: true, smoothScroll: true, requireAuth: true },
   },
   {
     path: "/profile/edit",
     name: "ProfileEdit",
     component: Profile,
     props: { edit: true },
-    beforeEnter(){
-      if(!store.state.authId) return { name: "SignIn"};
-    },
+    meta: { requireAuth: true },
   },
   {
     path: "/category/:id",
@@ -105,5 +103,7 @@ const router = createRouter({
     return scroll;
   },
 });
+
+router.beforeEach((to, _) => !store.state.authId && to.meta.requireAuth ? { name: "SignIn"} : true);
 
 export default router;
