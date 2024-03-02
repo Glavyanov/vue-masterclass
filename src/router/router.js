@@ -128,7 +128,10 @@ router.beforeEach(async function(to, from){
   await store.dispatch("initAuthentication");
 
   if(!store.state.authId && to.meta.requireAuth){
-    return { name: "SignIn"};
+    return { 
+      name: "SignIn", 
+      query: { redirectTo: to.path },
+    };
   }
   
   if(store.state.authId && to.meta.requireGuest){
