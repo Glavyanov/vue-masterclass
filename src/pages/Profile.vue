@@ -44,15 +44,5 @@ export default {
   created() {
     this.asyncDataStatus_fetched();
   },
-  watch: {
-    user: {
-      handler(val){
-        if(!val){
-          this.$router.push({ name: "SignIn"});
-        }
-      },
-      immediate: true,
-    }
-  }
 };
 </script>

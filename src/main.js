@@ -3,13 +3,6 @@ import App from "@/App.vue";
 import router from "@/router/router";
 import store from "@/store";
 import FontAwesome from "@/plugins/FontAwesome";
-import firebase from "@/helpers/firebase";
-
-firebase.auth().onAuthStateChanged( user => {
-  if(user){
-    store.dispatch("fetchAuthUser");
-  }
-});
 
 const forumApp = createApp(App);
 forumApp.use(router);

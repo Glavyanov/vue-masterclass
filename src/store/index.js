@@ -271,7 +271,17 @@ export default createStore({
       return Promise.all(
         ids.map((id) => dispatch("fetchItem", { id, resource }))
       );
-    }
+    },
+    initAuthentication({dispatch}){
+      return new Promise((resolve) => {
+        firebase.auth().onAuthStateChanged((user) => {
+          if(user){
+            dispatch("fetchAuthUser");
+          }
+          resolve(user);
+        });
+      });
+    },
   },
   mutations: {
     setItem(state, { resource, item }) {

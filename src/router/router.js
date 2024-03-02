@@ -104,6 +104,17 @@ const router = createRouter({
   },
 });
 
-//router.beforeEach((to, _) => !store.state.authId && to.meta.requireAuth ? { name: "SignIn"} : true);
+router.beforeEach(async function(to, from){
+  await store.dispatch("initAuthentication");
+
+  if(!store.state.authId && to.meta.requireAuth){
+    return { name: "SignIn"};
+  }
+  
+  if(store.state.authId && to.name === "SignIn"){
+    return { name: from.name};
+  }
+
+});
 
 export default router;
