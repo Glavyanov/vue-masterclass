@@ -104,6 +104,6 @@ const router = createRouter({
   },
 });
 
-router.beforeEach((to, _) => !store.state.authId && to.meta.requireAuth ? { name: "SignIn"} : true);
+//router.beforeEach((to, _) => !store.state.authId && to.meta.requireAuth ? { name: "SignIn"} : true);
 
 export default router;

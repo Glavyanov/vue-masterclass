@@ -12,7 +12,7 @@
           <a href="#">See only started threads?</a>
         </div>
         <hr />
-        <PostList :posts="user.posts" />
+        <PostList :posts="user?.posts" />
       </div>
     </div>
   </div>
@@ -44,5 +44,15 @@ export default {
   created() {
     this.asyncDataStatus_fetched();
   },
+  watch: {
+    user: {
+      handler(val){
+        if(!val){
+          this.$router.push({ name: "SignIn"});
+        }
+      },
+      immediate: true,
+    }
+  }
 };
 </script>

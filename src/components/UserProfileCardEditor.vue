@@ -3,8 +3,8 @@
     <form @submit.prevent="save">
       <p class="text-center">
         <img
-          :src="user.avatar"
-          :alt="`${user.name} profile picture`"
+          :src="user?.avatar"
+          :alt="`${user?.name} profile picture`"
           class="avatar-xlarge img-update"
         />
       </p>
@@ -38,8 +38,8 @@
       </div>
 
       <div class="stats">
-        <span>{{ user.postsCount }} posts</span>
-        <span>{{ user.threadsCount }} threads</span>
+        <span>{{ user?.postsCount }} posts</span>
+        <span>{{ user?.threadsCount }} threads</span>
       </div>
 
       <hr />
