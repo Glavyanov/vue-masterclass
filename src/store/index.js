@@ -274,11 +274,13 @@ export default createStore({
     },
     initAuthentication({dispatch}){
       return new Promise((resolve) => {
-        firebase.auth().onAuthStateChanged((user) => {
+        firebase.auth().onAuthStateChanged(async (user) => {
           if(user){
-            dispatch("fetchAuthUser");
+            await dispatch("fetchAuthUser");
+            resolve(user);
+          } else {
+            resolve(null);
           }
-          resolve(user);
         });
       });
     },
