@@ -80,12 +80,14 @@ const routes = [
     name: "ThreadCreate",
     component: ThreadCreate,
     props: true,
+    meta: { requireAuth: true },
   },
   {
     path: "/thread/:id/edit",
     name: "ThreadEdit",
     component: ThreadEdit,
     props: true,
+    meta: { requireAuth: true },
   },
   {
     path: "/logout",
