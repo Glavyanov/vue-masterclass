@@ -60,12 +60,16 @@ export default {
   methods: {
     async register () {
       await this.$store.dispatch("registerUserWithEmailAndPassword", this.form);
-      this.$router.push({name: "Home"});
+      this.successRedirect();
     },
     async registerWithGoogle(){
       await this.$store.dispatch("signInWithGoogle");
-      this.$router.push({name: "Home"});
-    }
+      this.successRedirect();
+    },
+    successRedirect(){
+      const path = this.$route.query.redirectTo || { name: "Home"};
+      this.$router.push(path)
+    },
   },
   created () {
     this.asyncDataStatus_fetched();
