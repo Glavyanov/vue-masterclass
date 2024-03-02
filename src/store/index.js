@@ -143,7 +143,18 @@ export default createStore({
 
       return docToResource(newUser);
     },
-    updateUser({ commit }, user) {
+    async updateUser({ commit }, user) {
+      const updates = {
+        avatar: user.avatar || null,
+        username: user.username || null,
+        name: user.name || null,
+        bio: user.bio || null,
+        website: user.website || null,
+        email: user.email || null,
+        location: user.location || null
+      };
+      const userRef = db.collection('users').doc(user.id);
+      await userRef.update(updates);
       commit("setItem", { resource: "users", item: user });
     },
     async updateThread({ commit, state }, { title, text, id }) {
