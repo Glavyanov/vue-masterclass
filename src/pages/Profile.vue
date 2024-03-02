@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container"  style="width: fit-content;">
     <div class="flex-grid">
       <div class="col-3 push-top">
         <UserProfileCard v-if="!edit" :user="user" />
@@ -41,7 +41,8 @@ export default {
   computed: {
     ...mapGetters({ user: "authUser" }),
   },
-  created() {
+  async created() {
+    await this.$store.dispatch("fetchAuthUserPosts");
     this.asyncDataStatus_fetched();
   },
 };

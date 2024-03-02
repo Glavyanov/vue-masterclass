@@ -253,6 +253,7 @@ export default createStore({
         });
       });
     },
+    //////////////////////////////////////////////////////////
     fetchItem({ commit }, { id, resource }) {
       return new Promise((resolve) => {
         db.collection(resource)
@@ -284,6 +285,12 @@ export default createStore({
             resolve(null);
           }
         });
+      });
+    },
+    async fetchAuthUserPosts({commit, state}){
+      const posts = await db.collection('posts').where('userId','==', state.authId).get();
+      posts.forEach( item => {
+        commit("setItem", { resource: 'posts', item});
       });
     },
   },
