@@ -11,6 +11,8 @@ import NotFound from "@/pages/NotFound";
 import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 import NProgress from "nprogress";
+import { findById } from "@/helpers";
+
 
 const routes = [
   {
@@ -58,6 +60,20 @@ const routes = [
     name: "ThreadShow",
     component: ThreadShow,
     props: true,
+    async beforeEnter(to, _,){
+      await store.dispatch("fetchThread", { id: to.params.id});
+      const threadExists = findById(store.state.threads, to.params.id);
+      if(threadExists){
+        return true;
+      } else {
+        return {
+          name: "NotFound",
+          params: { pathMatch: to.path.substring(1).split('/')},
+          query: to.query,
+          hash: to.hash
+        }
+      }
+    },
   },
   {
     path: "/forum/:forumId/thread/create",

@@ -67,11 +67,6 @@ export default {
       });
     },
   },
-  mounted() {
-    if (!this.thread) {
-      this.$router.push({ name: "NotFound" });
-    }
-  },
   async created() {
     const id = this.id;
     const thread = await this.$store.dispatch('fetchThread', { id });

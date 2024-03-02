@@ -263,6 +263,8 @@ export default createStore({
               const item = { ...res.data(), id: res.id };
               commit("setItem", { resource, item });
               resolve(item);
+            } else {
+              resolve(null);
             }
           });
       });
