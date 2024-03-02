@@ -24,11 +24,13 @@ const routes = [
     path: "/register",
     name: "Register",
     component: Register,
+    meta: { requireGuest: true },
   },
   {
     path: "/login",
     name: "SignIn",
     component: SignIn,
+    meta: { requireGuest: true },
   },
   {
     path: "/profile",
@@ -129,7 +131,7 @@ router.beforeEach(async function(to, from){
     return { name: "SignIn"};
   }
   
-  if(store.state.authId && to.name === "SignIn"){
+  if(store.state.authId && to.meta.requireGuest){
     return { name: from.name};
   }
 
