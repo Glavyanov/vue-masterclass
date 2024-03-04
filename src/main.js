@@ -4,12 +4,14 @@ import router from "@/router/router";
 import store from "@/store";
 import FontAwesome from "@/plugins/FontAwesome";
 import BackdropDirective from "@/plugins/BackdropDirective";
+import PageScrollDirective from "@/plugins/PageScrollDirective";
 
 const forumApp = createApp(App);
 forumApp.use(router);
 forumApp.use(store);
 forumApp.use(FontAwesome);
 forumApp.use(BackdropDirective);
+forumApp.use(PageScrollDirective);
 
 const requireComponent = require.context('./components', true, /App[A-Z]\w+\.(vue|js)$/);
 requireComponent.keys().forEach( function(fileName) {

@@ -1,5 +1,5 @@
 <template>
-  <header class="header" id="header">
+  <header class="header" id="header" v-page-scroll="() => mobileNavMenu = false">
     <router-link :to="{ name: 'Home' }" class="logo">
       <img src="../assets/svg/vueschool-logo.svg" />
     </router-link>
