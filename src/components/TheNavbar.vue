@@ -4,14 +4,14 @@
       <img src="../assets/svg/vueschool-logo.svg" />
     </router-link>
 
-    <div class="btn-hamburger">
+    <div class="btn-hamburger" @click="mobileNavMenu = !mobileNavMenu"  v-backdrop="() => mobileNavMenu = false">
       <!-- use .btn-hamburger-active to open the menu -->
       <div class="top bar"></div>
       <div class="middle bar"></div>
       <div class="bottom bar"></div>
     </div>
 
-    <nav class="navbar">
+    <nav class="navbar" :class="{'navbar-open': mobileNavMenu}">
       <ul>
         <li v-if="authUser" class="navbar-user">
           <a @click.prevent="userDropDownOpen = !userDropDownOpen" v-backdrop="() => userDropDownOpen = false">
@@ -47,6 +47,8 @@
             <span> Register </span>
           </router-link>
         </li>
+        <li v-if="authUser" class="navbar-mobile-item"><router-link :to="{ name: 'Profile' }">View profile</router-link></li>
+        <li v-if="authUser" class="navbar-mobile-item"><router-link :to="{ name: 'SignOut' }">Sign Out</router-link></li>
       </ul>
     </nav>
   </header>
@@ -59,6 +61,7 @@ export default {
   data(){
     return {
       userDropDownOpen: false,
+      mobileNavMenu: false,
     }
   },
   computed: {
