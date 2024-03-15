@@ -2,7 +2,7 @@ const BackdropDirective = {
     mounted(el, binding){
         el.__backdropHandler__ = event => {
             if(!(el === event.target || el.contains(event.target))){
-                binding.value(event);
+                binding.value(/* event */);
             }
         };
 
