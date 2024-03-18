@@ -40,9 +40,20 @@ export default {
   },
   computed: {
     ...mapGetters({ user: "authUser" }),
+    lastPostFetched(){
+      if(!this.user?.posts?.length){
+        return null;
+      }
+      return this.user.posts[this.user.posts.length - 1];
+    }
   },
   async created() {
-    await this.$store.dispatch("fetchAuthUserPosts");
+    await this.$store.dispatch("fetchAuthUserPosts", { startAfter: this.lastPostFetched});
+
+    setTimeout(async () => {
+      await this.$store.dispatch("fetchAuthUserPosts", { startAfter: this.lastPostFetched});
+    }, 2000);
+
     this.asyncDataStatus_fetched();
   },
 };

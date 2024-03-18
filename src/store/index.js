@@ -298,8 +298,16 @@ export default createStore({
         });
       });
     },
-    async fetchAuthUserPosts({commit, state}){
-      const posts = await db.collection('posts').where('userId','==', state.authId).get();
+    async fetchAuthUserPosts({commit, state}, { startAfter }){
+      let query = db.collection('posts')
+        .where('userId','==', state.authId)
+        .orderBy('publishedAt', 'desc')
+        .limit(1);
+      if(startAfter){
+        const doc = await db.collection('posts').doc(startAfter.id).get();
+        query = query.startAfter(doc);
+      }
+      const posts = await query.get();
       posts.forEach( item => {
         commit("setItem", { resource: 'posts', item});
       });
