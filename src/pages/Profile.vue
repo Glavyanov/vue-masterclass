@@ -28,14 +28,12 @@ import UserProfileCard from "@/components/UserProfileCard.vue";
 import UserProfileCardEditor from "@/components/UserProfileCardEditor.vue";
 import { mapGetters } from "vuex";
 import asyncDataStatus from "@/mixins/asyncDataStatus";
-import AppInfiniteScroll from "@/components/AppInfiniteScroll.vue";
 
 export default {
   components: {
     PostList,
     UserProfileCard,
     UserProfileCardEditor,
-    AppInfiniteScroll
 },
   mixins:[asyncDataStatus],
   props: {
