@@ -2,6 +2,7 @@ import { createStore } from "vuex";
 import { findById, upsert, docToResource } from "@/helpers";
 import firebaseConfig from "@/config/firebase";
 import firebase from "@/helpers/firebase";
+import chunk from "lodash/chunk";
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -286,7 +287,7 @@ export default createStore({
         ids.map((id) => dispatch("fetchItem", { id, resource }))
       );
     },
-    initAuthentication({dispatch}){
+    initAuthentication({dispatch}) {
       return new Promise((resolve) => {
         firebase.auth().onAuthStateChanged(async (user) => {
           if(user){
@@ -298,7 +299,7 @@ export default createStore({
         });
       });
     },
-    async fetchAuthUserPosts({commit, state}, { startAfter }){
+    async fetchAuthUserPosts({commit, state}, { startAfter }) {
       let query = db.collection('posts')
         .where('userId','==', state.authId)
         .orderBy('publishedAt', 'desc')
@@ -312,6 +313,12 @@ export default createStore({
         commit("setItem", { resource: 'posts', item});
       });
     },
+    fetchThreadsByPage({dispatch, commit}, { ids, page, perPage = 2}) {
+      commit("clearThreads");
+      const chunks = chunk(ids, perPage);
+      const limitedIds = chunks[page - 1];
+      return dispatch("fetchThreads", { ids: limitedIds})
+    }
   },
   mutations: {
     setItem(state, { resource, item }) {
@@ -336,6 +343,9 @@ export default createStore({
       parent: "threads",
       child: "contributors",
     }),
+    clearThreads(state){
+      state.threads = [];
+    }
   },
 });
 
