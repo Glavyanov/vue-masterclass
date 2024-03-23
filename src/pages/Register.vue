@@ -1,28 +1,34 @@
 <template>
   <div class="flex-grid justify-center">
     <div class="col-2">
-      <VeeForm @submit="register" class="card card-form" :validation-schema="{
-          name: (value) => {
-            if(value && value.trim()) return true;
-            return 'Full Name is required';    
-          },
-          username: (value) => {
-            if(value && value.trim()) return true;
-            return 'User name is required';  
-          }
-        }"
-      >
+      <VeeForm @submit="register" class="card card-form">
         <h1 class="text-center">Register</h1>
 
         <div class="form-group">
           <label for="name">Full Name</label>
-          <VeeField name="name" v-model="form.name" id="name" type="text" class="form-input" />
+          <VeeField
+            name="name"
+            v-model="form.name"
+            id="name"
+            type="text"
+            class="form-input"
+            label="Full Name"
+            :rules="required"
+          />
           <VeeErrorMessage name="name" class="form-error"/>
         </div>
 
         <div class="form-group">
           <label for="username">Username</label>
-          <VeeField name="username" v-model="form.username" id="username" type="text" class="form-input" />
+          <VeeField
+            name="username"
+            v-model="form.username"
+            id="username"
+            type="text"
+            class="form-input"
+            label="Username"
+            :rules="required"
+          />
           <VeeErrorMessage name="username" class="form-error"/>
         </div>
 
@@ -88,6 +94,11 @@ export default {
       const path = this.$route.query.redirectTo || { name: "Home"};
       this.$router.push(path)
     },
+    required(value, el){
+      debugger;
+      if(value && value.trim()) return true;
+      return `${el?.label || 'This'} is required`;
+    }
   },
   created () {
     this.asyncDataStatus_fetched();
