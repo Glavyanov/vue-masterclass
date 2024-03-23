@@ -13,7 +13,7 @@
             type="text"
             class="form-input"
             label="Full Name"
-            :rules="required"
+            rules="required"
           />
           <VeeErrorMessage name="name" class="form-error"/>
         </div>
@@ -27,7 +27,7 @@
             type="text"
             class="form-input"
             label="Username"
-            :rules="required"
+            rules="required"
           />
           <VeeErrorMessage name="username" class="form-error"/>
         </div>
@@ -61,15 +61,9 @@
 </template>
 <script>
 import asyncDataStatus from "@/mixins/asyncDataStatus";
-import { Form, Field, ErrorMessage } from "vee-validate";
 
 export default {
   mixins:[asyncDataStatus],
-  components: {
-    VeeForm: Form,
-    VeeField: Field,
-    VeeErrorMessage: ErrorMessage
-  },
   data () {
     return {
       form: {
@@ -94,11 +88,6 @@ export default {
       const path = this.$route.query.redirectTo || { name: "Home"};
       this.$router.push(path)
     },
-    required(value, el){
-      debugger;
-      if(value && value.trim()) return true;
-      return `${el?.label || 'This'} is required`;
-    }
   },
   created () {
     this.asyncDataStatus_fetched();
