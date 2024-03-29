@@ -3,18 +3,8 @@
     <div class="col-2">
       <VeeForm @submit="signIn" class="card card-form">
         <h1 class="text-center">Login</h1>
-
-        <div class="form-group">
-          <label for="email">Email</label>
-          <VeeField name="email" v-model="form.email" id="email" type="text" class="form-input" label="Email" rules="required" />
-          <VeeErrorMessage name="email" class="form-error"/>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <VeeField name="password" v-model="form.password" id="password" type="password" class="form-input" label="Password" rules="required" />
-          <VeeErrorMessage name="password" class="form-error"/>
-        </div>
-
+        <AppFormField v-model="form.email" name="email" label="Email" type="email" rules="required|email" />
+        <AppFormField v-model="form.password" name="password" label="Password" type="password" rules="required" />
         <div class="push-top">
           <button type="submit" class="btn-blue btn-block">Log in</button>
         </div>

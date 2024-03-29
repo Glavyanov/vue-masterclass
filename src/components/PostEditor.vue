@@ -1,20 +1,11 @@
 <template>
   <div class="col-full">
-    <form @submit.prevent="save">
-      <div class="form-group">
-        <textarea
-          name=""
-          id=""
-          cols="30"
-          rows="10"
-          class="form-input"
-          v-model="localPost.text"
-        />
-      </div>
+    <VeeForm @submit="save" :key="formKey">
+      <AppFormField as="textarea" v-model="localPost.text" name="text" label="" rules="required" rows="10" cols="30"/>
       <div class="form-actions">
         <button class="btn-blue">{{ localPost.id ? 'Edit post' : 'Submit post' }}</button>
       </div>
-    </form>
+    </VeeForm>
     <!-- <component
       :src="`https://www.google.com/recaptcha/api.js?render=${sitekey}`"
       :is="'script'"
@@ -48,6 +39,7 @@ export default {
       recaptchaToken: "",
       sitekey,
       localPost: { ...this.post },
+      formKey: Math.random(), // we need VeeForm to rerendered
     };
   },
   methods: {
@@ -100,6 +92,7 @@ export default {
           this.$emit("save", { post });
           this.localPost.text = "";
           this.recaptchaToken = "";
+          this.formKey = Math.random(); // we need to VeeForm rerendered
         })
         .catch((err) => {
           console.log(err);
