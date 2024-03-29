@@ -68,11 +68,15 @@
         <label class="form-label" for="user_location">Location</label>
         <input
           v-model="activeUser.location"
-          autocomplete="off"
           class="form-input"
           id="user_location"
+          list="locations"
+          @mouseenter="loadLocationOptions"
         />
       </div>
+      <datalist id="locations">
+        <option v-for="location in locationOptions" :value="location.name.common" :key="location.name.common" />
+      </datalist>
 
       <div class="btn-group space-between">
         <button @click="cancel" type="button" class="btn-ghost">Cancel</button>
@@ -92,6 +96,7 @@ export default {
   data() {
     return {
       activeUser: { ...this.user },
+      locationOptions: [],
     };
   },
   methods: {
@@ -102,6 +107,11 @@ export default {
     cancel() {
       this.$router.push({ name: "Profile" });
     },
+    async loadLocationOptions(){
+      if(this.locationOptions.length) return;
+      const res = await fetch('https://restcountries.com/v3/all');
+      this.locationOptions = await res.json();
+    }
   },
 };
 </script>
