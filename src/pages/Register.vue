@@ -48,7 +48,16 @@
 
         <div class="form-group">
           <label for="password">Password</label>
-          <VeeField name="password" v-model="form.password" id="password" type="password" class="form-input" />
+          <VeeField
+            name="password"
+            v-model="form.password"
+            id="password"
+            type="password"
+            class="form-input"
+            label="Password"
+            rules="required|min:6"
+          />
+          <VeeErrorMessage name="password" class="form-error"/>
         </div>
 
         <div class="form-group">

@@ -1,5 +1,5 @@
 import { Field, Form, ErrorMessage, defineRule } from "vee-validate"
-import { email } from "@vee-validate/rules";
+import { email, min } from "@vee-validate/rules";
 
 export default (app) => {
 
@@ -9,6 +9,7 @@ export default (app) => {
     });
 
     defineRule('email', email);
+    defineRule('min', min);
 
     app.component('VeeForm', Form);
     app.component('VeeField', Field);
