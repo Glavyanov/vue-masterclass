@@ -27,7 +27,7 @@
             type="text"
             class="form-input"
             label="Username"
-            rules="required"
+            rules="required|unique:users,username"
           />
           <VeeErrorMessage name="username" class="form-error"/>
         </div>
@@ -40,7 +40,7 @@
             id="email"
             type="email"
             class="form-input"
-            rules="required|email"
+            rules="required|email|unique:users,email"
             label="Email"
           />
           <VeeErrorMessage name="email" class="form-error"/>
