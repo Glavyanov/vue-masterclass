@@ -4,61 +4,10 @@
       <VeeForm @submit="register" class="card card-form">
         <h1 class="text-center">Register</h1>
 
-        <div class="form-group">
-          <label for="name">Full Name</label>
-          <VeeField
-            name="name"
-            v-model="form.name"
-            id="name"
-            type="text"
-            class="form-input"
-            label="Full Name"
-            rules="required"
-          />
-          <VeeErrorMessage name="name" class="form-error"/>
-        </div>
-
-        <div class="form-group">
-          <label for="username">Username</label>
-          <VeeField
-            name="username"
-            v-model="form.username"
-            id="username"
-            type="text"
-            class="form-input"
-            label="Username"
-            rules="required|unique:users,username"
-          />
-          <VeeErrorMessage name="username" class="form-error"/>
-        </div>
-
-        <div class="form-group">
-          <label for="email">Email</label>
-          <VeeField
-            name="email"
-            v-model="form.email"
-            id="email"
-            type="email"
-            class="form-input"
-            rules="required|email|unique:users,email"
-            label="Email"
-          />
-          <VeeErrorMessage name="email" class="form-error"/>
-        </div>
-
-        <div class="form-group">
-          <label for="password">Password</label>
-          <VeeField
-            name="password"
-            v-model="form.password"
-            id="password"
-            type="password"
-            class="form-input"
-            label="Password"
-            rules="required|min:6"
-          />
-          <VeeErrorMessage name="password" class="form-error"/>
-        </div>
+        <AppFormField v-model="form.name" name="name" label="Full Name" type="text" rules="required" />
+        <AppFormField v-model="form.username" name="username" label="Username" type="text" rules="required|unique:users,username" />
+        <AppFormField v-model="form.email" name="email" label="Email" type="email" rules="required|email|unique:users,email" />
+        <AppFormField v-model="form.password" name="password" label="Password" type="password" rules="required|min:6" />
 
         <div class="form-group">
           <label for="avatar">Avatar</label>
